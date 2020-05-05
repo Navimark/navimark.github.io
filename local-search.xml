@@ -4,53 +4,6 @@
   
   
   <entry>
-    <title>Hello World</title>
-    <link href="/2020/05/05/hello-world/"/>
-    <url>/2020/05/05/hello-world/</url>
-    
-    <content type="html"><![CDATA[<p>Welcome to <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/" target="_blank" rel="noopener">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html" target="_blank" rel="noopener">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues" target="_blank" rel="noopener">GitHub</a>.</p><h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><pre><code class="hljs bash">$ hexo new <span class="hljs-string">"My New Post"</span></code></pre>{% note success %}文字 或者 `markdown` 均可{% endnote %}<p>More info: <a href="https://hexo.io/docs/writing.html" target="_blank" rel="noopener">Writing</a></p><h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><pre><code class="hljs bash">$ hexo server</code></pre><p>More info: <a href="https://hexo.io/docs/server.html" target="_blank" rel="noopener">Server</a></p><h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files "></a>Generate static files <a class="btn" href="url"  title="title">text</a></h3><pre><code class="hljs bash">$ hexo generate</code></pre><ul><li>以下测试用的代码</li></ul><pre><code class="hljs objc">- (RMXArrayReduceFunc)rmx_reduce&#123;    <span class="hljs-keyword">return</span> ^<span class="hljs-keyword">id</span>(<span class="hljs-keyword">id</span> initialResult, RMXArrayReduceBlock nextPartialResult) &#123;        <span class="hljs-keyword">if</span> (!nextPartialResult) <span class="hljs-keyword">return</span> initialResult;        __block <span class="hljs-keyword">id</span> result = initialResult;        [<span class="hljs-keyword">self</span> enumerateObjectsUsingBlock:^(<span class="hljs-keyword">id</span> obj, <span class="hljs-built_in">NSUInteger</span> idx, <span class="hljs-built_in">BOOL</span> *stop) &#123;            result = nextPartialResult(idx, obj, result);        &#125;];        <span class="hljs-keyword">return</span> result;    &#125;;&#125;</code></pre><ul><li>C++ 代码：</li></ul><pre><code class="hljs c++"><span class="hljs-function">ESSENTIA_API <span class="hljs-keyword">void</span> <span class="hljs-title">registerAlgorithm</span><span class="hljs-params">()</span> </span>&#123;    AlgorithmFactory::Registrar&lt;NoiseAdder&gt; regNoiseAdder;    AlgorithmFactory::Registrar&lt;MelBands&gt; regMelBands;    <span class="hljs-comment">//AlgorithmFactory::Registrar&lt;MonoMixer&gt; regMonoMixer;</span>    AlgorithmFactory::Registrar&lt;OnsetDetection&gt; regOnsetDetection;    AlgorithmFactory::Registrar&lt;Onsets&gt; regOnsets;    AlgorithmFactory::Registrar&lt;Windowing&gt; regWindowing;    AlgorithmFactory::Registrar&lt;LowPass&gt; regLowPass;    AlgorithmFactory::Registrar&lt;HFC&gt; regHFC;    <span class="hljs-comment">//AlgorithmFactory::Registrar&lt;FrameCutter&gt; regFrameCutter;</span>    AlgorithmFactory::Registrar&lt;MovingAverage&gt; regMovingAverage;    <span class="hljs-comment">//AlgorithmFactory::Registrar&lt;OnsetRate&gt; regOnsetRate;</span>    <span class="hljs-comment">//AlgorithmFactory::Registrar&lt;AudioLoader&gt; regAudioLoader;</span>    AlgorithmFactory::Registrar&lt;CartesianToPolar&gt; regCartesianToPolar;    AlgorithmFactory::Registrar&lt;IIR&gt; regIIR;AlgorithmFactory::Registrar&lt;Flux&gt; regFlux;    AlgorithmFactory::Registrar&lt;FFTK&gt; regFFTK;&#125;</code></pre><p>More info: <a href="https://hexo.io/docs/generating.html" target="_blank" rel="noopener">Generating</a></p><h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites "></a>Deploy to remote sites <span class="label label-primary">text</span></h3><pre><code class="hljs bash">$ hexo deploy</code></pre><p>More info: <a href="https://hexo.io/docs/one-command-deployment.html" target="_blank" rel="noopener">Deployment</a></p><p><img src="/Users/chenzheng/Desktop/%E6%88%AA%E5%B1%8F2020-04-15%E4%B8%8A%E5%8D%889.47.47.png" srcset="/img/loading.gif" alt="本地图片而已" title="鼠标提示文字？"></p>]]></content>
-    
-    
-    
-    <tags>
-      
-      <tag>Hexo</tag>
-      
-      <tag>Fluid</tag>
-      
-    </tags>
-    
-  </entry>
-  
-  
-  
-  <entry>
-    <title>我有首页图片占位</title>
-    <link href="/2020/05/05/wo-you-shou-ye-tu-pian-zhan-wei/"/>
-    <url>/2020/05/05/wo-you-shou-ye-tu-pian-zhan-wei/</url>
-    
-    <content type="html"><![CDATA[<ol><li><img src="/%E6%88%91%E6%9C%89%E9%A6%96%E9%A1%B5%E5%9B%BE%E7%89%87%E5%8D%A0%E4%BD%8D/screen_shot.png" srcset="/img/loading.gif" alt="本地图片而已" title="鼠标提示文字？"></li><li><img src="/screen_shot.png" srcset="/img/loading.gif" alt="本地图片而已" title="鼠标提示文字？"></li><li><img src="screen_shot.png" srcset="/img/loading.gif" alt="本地图片而已" title="鼠标提示文字？"></li></ol>]]></content>
-    
-    
-    
-  </entry>
-  
-  
-  
-  <entry>
-    <title>artical with img</title>
-    <link href="/2020/05/05/artical-with-img/"/>
-    <url>/2020/05/05/artical-with-img/</url>
-    
-    <content type="html"><![CDATA[<ul><li>只能在文章内部展示的图片</li></ul><p><img src="screen_shot.png" srcset="/img/loading.gif" alt="标签文字" title="悬停文字"></p><ul><li>可以再首页和文章展示的图片</li></ul><img src="/2020/05/05/artical-with-img/screen_shot.png" srcset="/img/loading.gif" class="" title="This is an image">]]></content>
-    
-    
-    
-  </entry>
-  
-  
-  
-  <entry>
     <title>如何快速更换 App icon</title>
     <link href="/2020/05/05/how-change-icon/"/>
     <url>/2020/05/05/how-change-icon/</url>
