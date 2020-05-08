@@ -4,6 +4,37 @@
   
   
   <entry>
+    <title>由 block 的内存布局衍生而来的面试题</title>
+    <link href="/2020/05/08/you-block-de-nei-cun-bu-ju-yan-sheng-er-lai-de-mian-shi-ti/"/>
+    <url>/2020/05/08/you-block-de-nei-cun-bu-ju-yan-sheng-er-lai-de-mian-shi-ti/</url>
+    
+    <content type="html"><![CDATA[<p>今天在群里看到大佬们在讨论一个面试题，问如下代码在 32bit 和 64bit 系统上分别报什么错误：</p><pre><code class="hljs objc"><span class="hljs-meta">#import <span class="hljs-meta-string">&lt;Foundation/Foundation.h&gt;</span></span><span class="hljs-keyword">int</span> main()&#123;    <span class="hljs-keyword">void</span> (^block)(<span class="hljs-keyword">void</span>) = <span class="hljs-literal">nil</span>;    block();    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;&#125;</code></pre><p>虽然有大佬一下子说出了答案，但我仍然一脸懵逼，后来经人提醒，这个考察 block 在内存中的结构，于是赶紧做了如下实验终于弄懂了为什么。</p><ul><li><p>实验<br>将以上代码保存为 <code>block_test.m</code> ，在命令行编译成 C++:<code>clang -rewrite-objc -fobjc-arc block_test.m</code>，打开同一目录下生成的<code>block_test.cpp</code>文件，截取如下关键代码：</p><pre><code class="hljs c++"><span class="hljs-comment">// 注释①</span><span class="hljs-class"><span class="hljs-keyword">struct</span> __<span class="hljs-title">block_impl</span> &#123;</span>  <span class="hljs-keyword">void</span> *isa;  <span class="hljs-keyword">int</span> Flags;  <span class="hljs-keyword">int</span> Reserved;  <span class="hljs-keyword">void</span> *FuncPtr;&#125;;<span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span><span class="hljs-function"></span>&#123;    <span class="hljs-keyword">void</span> (*block)(<span class="hljs-keyword">void</span>) = __null;    <span class="hljs-comment">// 注释 ②</span>    ((<span class="hljs-keyword">void</span> (*)(__block_impl *))((__block_impl *)block)-&gt;FuncPtr)((__block_impl *)block);    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;&#125;</code></pre></li><li><p>解释：</p><ol><li>注释①所在的结构体是 block 在内存中的数据结构。</li><li>注释②是一个函数调用语句，可以简化成：<code>((__block_impl *)block)-&gt;FuncPtr(block)</code>，即调用 <code>__block_impl</code> 类型指针指向的结构体中 <code>FuncPtr</code> 指向的函数，由于该结构体指针指向的内容为 null，因此 <code>FuncPtr</code>指向的位置显然不是一个函数，所以该指针指向的位置会发生一个<code>EXC_BAD_ACCESS</code> 错误。</li><li><code>FuncPtr</code> 指向的位置是多少呢？根据上述<code>__block_impl</code>中各成员变量的排列可知 <code>FuncPtr</code> 的偏移是 <code>sizeof(void *) + sizeof(int) + sizeof(int)</code>，另外还需要考虑结构体内存对齐，参考<a href="https://www.jianshu.com/p/3294668e2d8c" target="_blank" rel="noopener">这个链接</a>，所以在 32bit 系统中，偏移：<code>4 + 4 + 4 = 0x0C</code>；64bit 系统中，偏移：<code>8 + 8 = 0x10</code></li></ol></li><li><p>结论：</p><ul><li>答案：在 32bit 系统中报错：<code>EXC_BAD_ACCESS(address = 0x0C)</code>，在 64bit 系统中报错<code>EXC_BAD_ACCESS(address = 0x10)</code></li><li>block 本质是一个结构体，在探究 block 相关的问题时，转换成 <code>C++</code> 代码后往往就可以一目了然，比如<a href="https://www.jianshu.com/p/4e9d3ef9a199" target="_blank" rel="noopener">weakSelf 为什么可以解决循环引用</a></li></ul></li></ul>]]></content>
+    
+    
+    <categories>
+      
+      <category>底层</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>iOS</tag>
+      
+      <tag>block</tag>
+      
+      <tag>汇编</tag>
+      
+      <tag>面试</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>如何快速更换 App icon</title>
     <link href="/2020/05/05/how-change-icon/"/>
     <url>/2020/05/05/how-change-icon/</url>
