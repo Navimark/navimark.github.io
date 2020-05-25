@@ -206,13 +206,13 @@
 <li>头文件：<code>Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/mach-o/loader.h</code></li>
 <li><a href="https://developer.apple.com/library/archive/documentation/Performance/Conceptual/CodeFootprint/Articles/MachOOverview.html" target="_blank" rel="noopener">苹果文档</a></li>
 </ol>
-<h1 id="文件描述"><a href="#文件描述" class="headerlink" title="文件描述"></a>文件描述</h1><h4 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h4><p>Mach-O 可以按照所包含的架构分类，如<code>arm64</code>、<code>armv7</code>、<code>x86_64</code>，一个 Mach-O 文件可以包含不止一个架构，该 Mach-O 将被称为通用二进制格式，即 <code>FAT</code> 二进制 ，通用二进制文件的结构和单架构的只有组织方式上有一些区别，根据苹果官网的一张老图，64-bit Mach-O 的主要组成：<br><img src="a58100d4/16c8a23a6de8960e.png" alt="Mach-O 结构1"></p>
+<h1 id="文件描述"><a href="#文件描述" class="headerlink" title="文件描述"></a>文件描述</h1><h4 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h4><p>Mach-O 可以按照所包含的架构分类，如<code>arm64</code>、<code>armv7</code>、<code>x86_64</code>，一个 Mach-O 文件可以包含不止一个架构，该 Mach-O 将被称为通用二进制格式，即 <code>FAT</code> 二进制 ，通用二进制文件的结构和单架构的只有组织方式上有一些区别，根据苹果官网的一张老图，64-bit Mach-O 的主要组成：<br><img src="a58100d4/16c8a23a6de8960e.png" srcset="/img/loading.gif" alt="Mach-O 结构1"></p>
 <ol>
 <li><code>Header</code>: 位于文件的开始部分，包含二进制的标记信息：类型架构、CPU 类型、文件类型、加载命令的个数等，表明自身的文件属性，方便操作系统内核知道接下来能用什么方式来加载和处理该文件。其中文件类型有目标文件、可执行文件、动态库、动态链接器、<code>dSYM</code> 等。</li>
 <li><code>Load Commands</code>: 紧跟在 <code>Header</code> 的后面，它描述了 <code>segment</code>（段）、符号表、系统动态链接库等的加载，每一个<code>Load Commands</code>都包含有命令类型、占用空间大小、名字等基本信息，不同的数据类型使用不同的加载命令表示。这是和加载（内存映射）相关的区域，操作系统内核为了提高加载效率减少页内碎片，要求每一个段被映射到虚拟内存后所占空间需要按照 <code>PAGESIZE</code> 进行对齐。</li>
 <li><code>Data</code>: 这部分主要存放我们的程序指令和程序所用到的变量、类、方法等，另外还有和装载内存映射相关的 Rebase、Binding、符号表、字符串表等信息。</li>
 </ol>
-<h4 id="整体结构"><a href="#整体结构" class="headerlink" title="整体结构"></a>整体结构</h4><p>整个文件的结构大致为：<br><img src="a58100d4/WX20200518-151703@2x.png" alt="Mach-O 结构2"></p>
+<h4 id="整体结构"><a href="#整体结构" class="headerlink" title="整体结构"></a>整体结构</h4><p>整个文件的结构大致为：<br><img src="a58100d4/WX20200518-151703@2x.png" srcset="/img/loading.gif" alt="Mach-O 结构2"></p>
 <h1 id="Mach-O-结构"><a href="#Mach-O-结构" class="headerlink" title="Mach-O 结构"></a>Mach-O 结构</h1><p>和 Mach-O 结构相关的数据结构在<code>&lt;mach-o/loader.h&gt;</code> 和 <code>&lt;mach-o/fat.h&gt;</code>中可以找到，其中 64-bit 的 Header 结构：</p>
 <pre><code class="hljs c"><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">mach_header_64</span> &#123;</span>
 	<span class="hljs-keyword">uint32_t</span>	magic;      <span class="hljs-comment">/* 魔数，操作系统加载器将根据这个字段决定后续如何识别和加载该二进制 */</span>
@@ -346,7 +346,7 @@ NSLog(@<span class="hljs-string">"%X"</span>,*magic);
     <span class="hljs-built_in">NSLog</span>(<span class="hljs-string">@"reserved:%d"</span>,header-&gt;reserved); <span class="hljs-comment">// 0</span>
     free(header);
 &#125;</code></pre>
-上述宏定义可以在 <code>iPhoneOS.sdk/usr/include/mach-o/loader.h</code> 和 <code>MacOSX.sdk/usr/include/mach/machine.h</code> 查到<br>将 <a href="https://github.com/Navimark/MachOExploration/blob/master/HelloWorld/HelloWorld" target="_blank" rel="noopener">Demo Mach-O</a> 拖入到 MachOView 中可以验证：<br><img src="header-mach-oviewer.png" alt="图片"></li>
+上述宏定义可以在 <code>iPhoneOS.sdk/usr/include/mach-o/loader.h</code> 和 <code>MacOSX.sdk/usr/include/mach/machine.h</code> 查到<br>将 <a href="https://github.com/Navimark/MachOExploration/blob/master/HelloWorld/HelloWorld" target="_blank" rel="noopener">Demo Mach-O</a> 拖入到 MachOView 中可以验证：<br><img src="header-mach-oviewer.png" srcset="/img/loading.gif" alt="图片"></li>
 </ul>
 <h4 id="读取-Load-Commands"><a href="#读取-Load-Commands" class="headerlink" title="读取 Load Commands"></a>读取 Load Commands</h4><p>Load Commands 紧跟在 Header 的后面，所有的 Load Commands 都“继承”自同一个基结构体，先用这个基结构体去套取数据以得到 load command 的类型，然后选用合适的类型读取完整的数据</p>
 <pre><code class="hljs c"><span class="hljs-comment">// 基结构体</span>
