@@ -346,7 +346,7 @@ NSLog(@<span class="hljs-string">"%X"</span>,*magic);
     <span class="hljs-built_in">NSLog</span>(<span class="hljs-string">@"reserved:%d"</span>,header-&gt;reserved); <span class="hljs-comment">// 0</span>
     free(header);
 &#125;</code></pre>
-上述宏定义可以在 <code>iPhoneOS.sdk/usr/include/mach-o/loader.h</code> 和 <code>MacOSX.sdk/usr/include/mach/machine.h</code> 查到<br>将 <a href="https://github.com/Navimark/MachOExploration/blob/master/HelloWorld/HelloWorld" target="_blank" rel="noopener">Demo Mach-O</a> 拖入到 MachOView 中可以验证：<br><img src="header-mach-oviewer.png" srcset="/img/loading.gif" alt="图片"></li>
+上述宏定义可以在 <code>iPhoneOS.sdk/usr/include/mach-o/loader.h</code> 和 <code>MacOSX.sdk/usr/include/mach/machine.h</code> 查到<br>将 <a href="https://github.com/Navimark/MachOExploration/blob/master/HelloWorld/HelloWorld" target="_blank" rel="noopener">Demo Mach-O</a> 拖入到 MachOView 中可以验证：<br><img src="a58100d4/header-mach-oviewer.png" srcset="/img/loading.gif" alt="图片"></li>
 </ul>
 <h4 id="读取-Load-Commands"><a href="#读取-Load-Commands" class="headerlink" title="读取 Load Commands"></a>读取 Load Commands</h4><p>Load Commands 紧跟在 Header 的后面，所有的 Load Commands 都“继承”自同一个基结构体，先用这个基结构体去套取数据以得到 load command 的类型，然后选用合适的类型读取完整的数据</p>
 <pre><code class="hljs c"><span class="hljs-comment">// 基结构体</span>
