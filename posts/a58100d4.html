@@ -341,7 +341,8 @@ NSLog(@<span class="hljs-string">"%X"</span>,*magic);
     <span class="hljs-built_in">NSLog</span>(<span class="hljs-string">@"filetype:%d"</span>,header-&gt;filetype); <span class="hljs-comment">// 2 = MH_EXECUTE;</span>
     <span class="hljs-built_in">NSLog</span>(<span class="hljs-string">@"ncmds:%d"</span>,header-&gt;ncmds); <span class="hljs-comment">// 21</span>
     <span class="hljs-built_in">NSLog</span>(<span class="hljs-string">@"sizeofcmds:%d"</span>,header-&gt;sizeofcmds); <span class="hljs-comment">// 2704</span>
-	<span class="hljs-comment">// 2097285 = (flags &amp; MH_TWOLEVEL) | (flags &amp; MH_PIE) | (flags &amp; MH_DYLDLINK) | (flags &amp; MH_NOUNDEFS)</span>
+	<span class="hljs-comment">/// 2097285 = (flags &amp; MH_TWOLEVEL) | (flags &amp; MH_PIE) |</span>
+    <span class="hljs-comment">///           (flags &amp; MH_DYLDLINK) | (flags &amp; MH_NOUNDEFS)</span>
     <span class="hljs-built_in">NSLog</span>(<span class="hljs-string">@"flags:%d"</span>,header-&gt;flags); <span class="hljs-comment">// 2097285</span>
     <span class="hljs-built_in">NSLog</span>(<span class="hljs-string">@"reserved:%d"</span>,header-&gt;reserved); <span class="hljs-comment">// 0</span>
     free(header);
@@ -368,7 +369,8 @@ uint32_t lc_offset = <span class="hljs-keyword">sizeof</span>(<span class="hljs-
 <p>读取到的基结构后，使用完成的结构体套取完整数据：</p>
 <pre><code class="hljs objc"><span class="hljs-keyword">void</span> segment_64_load_handler(FILE *fp, uint32_t offset)
 &#123;
-    <span class="hljs-keyword">struct</span> segment_command_64 *sc_64 = load_bytes(fp, offset, <span class="hljs-keyword">sizeof</span>(<span class="hljs-keyword">struct</span> segment_command_64));
+    <span class="hljs-keyword">struct</span> segment_command_64 *sc_64 = load_bytes(fp, offset, 
+                                        <span class="hljs-keyword">sizeof</span>(<span class="hljs-keyword">struct</span> segment_command_64));
     <span class="hljs-built_in">NSLog</span>(<span class="hljs-string">@"cmd:%d"</span>,sc_64-&gt;cmd);
     <span class="hljs-built_in">NSLog</span>(<span class="hljs-string">@"cmdsize:%d"</span>,sc_64-&gt;cmdsize);
     <span class="hljs-built_in">NSLog</span>(<span class="hljs-string">@"segname:%s"</span>,sc_64-&gt;segname);
@@ -385,9 +387,11 @@ uint32_t lc_offset = <span class="hljs-keyword">sizeof</span>(<span class="hljs-
 
 <span class="hljs-keyword">void</span> dyld_info_command_handler(FILE *fp, uint32_t offset)
 &#123;
-    <span class="hljs-keyword">struct</span> dyld_info_command *dyld_c = load_bytes(fp, offset, <span class="hljs-keyword">sizeof</span>(<span class="hljs-keyword">struct</span> dyld_info_command));
+    <span class="hljs-keyword">struct</span> dyld_info_command *dyld_c = load_bytes(fp, offset, 
+                                        <span class="hljs-keyword">sizeof</span>(<span class="hljs-keyword">struct</span> dyld_info_command));
 	<span class="hljs-comment">// 使用 %d 打印会溢出</span>
-    <span class="hljs-built_in">NSLog</span>(<span class="hljs-string">@"cmd:%@"</span>,@(dyld_c-&gt;cmd)); <span class="hljs-comment">// 2147483682 = (0x22 | LC_REQ_DYLD) = (0x22 | 0x80000000) = LC_DYLD_INFO_ONLY</span>
+    <span class="hljs-comment">// 2147483682 = (0x22 | LC_REQ_DYLD) = (0x22 | 0x80000000) = LC_DYLD_INFO_ONLY</span>
+    <span class="hljs-built_in">NSLog</span>(<span class="hljs-string">@"cmd:%@"</span>,@(dyld_c-&gt;cmd)); 
     <span class="hljs-built_in">NSLog</span>(<span class="hljs-string">@"cmdsize:%d"</span>,dyld_c-&gt;cmdsize);
     <span class="hljs-built_in">NSLog</span>(<span class="hljs-string">@"rebase_off:%d"</span>,dyld_c-&gt;rebase_off);
     <span class="hljs-built_in">NSLog</span>(<span class="hljs-string">@"rebase_size:%d"</span>,dyld_c-&gt;rebase_size);
@@ -431,7 +435,8 @@ uint32_t lc_offset = <span class="hljs-keyword">sizeof</span>(<span class="hljs-
 	<span class="hljs-class"><span class="hljs-keyword">struct</span> __<span class="hljs-title">block_impl</span> <span class="hljs-title">impl</span>;</span>
 	<span class="hljs-class"><span class="hljs-keyword">struct</span> __<span class="hljs-title">main_block_desc_0</span>* <span class="hljs-title">Desc</span>;</span>
 	__Block_byref_age_0 *age; <span class="hljs-comment">// block 捕获的变量，封装成了结构体</span>
-	__main_block_impl_0(<span class="hljs-keyword">void</span> *fp, struct __main_block_desc_0 *desc, __Block_byref_age_0 *_age, <span class="hljs-keyword">int</span> flags=<span class="hljs-number">0</span>) : age(_age-&gt;__forwarding) &#123;
+	__main_block_impl_0(<span class="hljs-keyword">void</span> *fp, struct __main_block_desc_0 *desc, 
+                       __Block_byref_age_0 *_age, <span class="hljs-keyword">int</span> flags=<span class="hljs-number">0</span>) : age(_age-&gt;__forwarding) &#123;
 		impl.isa = &amp;_NSConcreteStackBlock;
 		impl.Flags = flags;
 		impl.FuncPtr = fp;
