@@ -4,7 +4,7 @@
   
   
   <entry>
-    <title>fastlane_tricks_revert_cert</title>
+    <title>Fastlane Match 使用技巧——如何重置证书/描述文件</title>
     <link href="/posts/feb5cc21.html"/>
     <url>/posts/feb5cc21.html</url>
     
@@ -49,13 +49,13 @@
     
     <tags>
       
+      <tag>Mach-O</tag>
+      
       <tag>底层</tag>
       
       <tag>iOS</tag>
       
       <tag>Objective-C</tag>
-      
-      <tag>Mach-O</tag>
       
       <tag>数据结构</tag>
       
