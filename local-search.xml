@@ -4,6 +4,35 @@
   
   
   <entry>
+    <title>fastlane_tricks_revert_cert</title>
+    <link href="/posts/feb5cc21.html"/>
+    <url>/posts/feb5cc21.html</url>
+    
+    <content type="html"><![CDATA[<p><a href="https://docs.fastlane.tools/actions/match/" target="_blank" rel="noopener">fastlane match</a> 有多香咱就不赘述了，尤其是团队开发和做 CI 时，在开发证书和测试设备管理这两方面使用 fastlane match 能节省不少时间和精力。不过有时候我们会碰到需要重新生成描述文件或重置证书的情况，比如接入 Apple Sign In 功能时，需要在证书中增加对应的能力，必须要更新描述文件时；用于生成原开发证书的本地私钥丢失，不得不重新生成整套证书时。此时 fastlane match 官网并没有明确告诉如何应对，但通过 fastlane match 的工作原理，我们还是可以总结出最佳实践的。</p><blockquote><p>本文假设读者已经在使用 fastlane match，已经会 fastlane match 的基本使用。如果您对 fastlane match 有使用上的问题也欢迎留言交流</p></blockquote><p>下面分两种情况介绍步骤，一种是需要重置证书，一种是需要重置<code>mobileprovision</code>。</p><h1 id="重置证书"><a href="#重置证书" class="headerlink" title="重置证书"></a>重置证书</h1><ol><li>删除 ITC 后台中需要被重置的证书，包括 <code>development</code> 和 <code>distribution</code> 类型的。注意，此步骤不影响已上线的 App 和通过 TestFlight 分发的 App，但是会影响已发布的测试版本 App，插线 Debug 版的和 AdHoc 版本的 App 在联网时将启动即闪退</li><li>删除 ITC 后台中需要被重置证书对应的描述文件。（不是必须的，但如果不删除的话，fastlane match 接下来重新生成的描述文件名将自动带上数字后缀，强迫症患者看了会很难受）</li><li>在本地存放描述文件的文件夹（<code>~/Library/MobileDevice/Provisioning Profiles</code>）中删除对应的描述文件。不是必须的，非洁癖患者可以跳过</li><li>在 fastlane match 所管理的存放证书和描述文件的 git 仓库中，删除需要被重置的证书和描述文件，然后手动 <code>commit</code> 和 <code>push</code></li><li>在本地钥匙串中删除需要被重置的证书，证书和私钥都删除</li><li>执行 <code>fastlane match development</code>  (注意不要添加<code>--readonly</code>参数)以重置开发证书，当 fastlane match 检测到 Git 仓库没有副本时将尝试登陆 ITC ，期间会要求输入有权限操作证书的开发者账号信息，如果 ITC 也没有将会重新生成。之后分别使用<code>appstore</code>和<code>adhoc</code> 参数重置 AdHoc 和 AppStore 证书。</li></ol><h1 id="重置描述文件"><a href="#重置描述文件" class="headerlink" title="重置描述文件"></a>重置描述文件</h1><ol><li>删除 ITC 后台中需要被重置的描述文件</li><li>在 fastlane match 所管理的存放证书和描述文件的 git 仓库中，删除需要被重置的描述文件，然后手动 <code>commit</code> 和 <code>push</code></li><li>在本地存放描述文件的文件夹（<code>~/Library/MobileDevice/Provisioning Profiles</code>）中删除需要被重置的描述文件。(不是必须的，非洁癖患者可以跳过)</li><li>执行 <code>fastlane match development</code>  (注意不要添加<code>--readonly</code>参数)以重置开发证书，当 fastlane match 检测到 Git 仓库没有副本时将尝试登陆 ITC ，期间会要求输入有权限操作证书的开发者账号信息，如果 ITC 也没有将会重新生成。之后使用<code>adhoc</code> 参数重置 AdHoc 描述文件</li></ol>]]></content>
+    
+    
+    <categories>
+      
+      <category>开发技巧</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>fastlane</tag>
+      
+      <tag>工具</tag>
+      
+      <tag>match</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>Mach-O 文件结构详解</title>
     <link href="/posts/a58100d4.html"/>
     <url>/posts/a58100d4.html</url>
@@ -20,13 +49,13 @@
     
     <tags>
       
+      <tag>Mach-O</tag>
+      
       <tag>底层</tag>
       
       <tag>iOS</tag>
       
       <tag>Objective-C</tag>
-      
-      <tag>Mach-O</tag>
       
       <tag>数据结构</tag>
       
