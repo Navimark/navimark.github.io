@@ -208,9 +208,10 @@
             <article class="markdown-body">
               <p>❓ 在断点调试 iOS 程序碰到 block 作为函数的形参时，如果想知道该 block 本身的函数签名信息和函数体地址时，有哪些办法？<br>🤪 当然是在源码里面直接查看 block 的声明和调用了！<br>❗️ 但如果源码不可见呢？在分析第三方闭源库或友商 App 的某些逻辑实现时，就只有汇编代码可用</p>
 <p>☕️ 本文将通过汇编代码入手探讨 block 的内存结构，并尝试还原 block 的函数签名信息和函数体真实地址</p>
-<h2 id="环境准备"><a href="#环境准备" class="headerlink" title="环境准备"></a>环境准备</h2><blockquote>
-<p>如果拿真实案例来做分析，势必会有一系列繁琐的前期准备步骤，而且一时也想不起来有哪些友商 App 刚好可以做 demo，所以本文将使用本地环境做模拟，并直接从最关键的步骤开始</p>
-</blockquote>
+<h2 id="环境准备"><a href="#环境准备" class="headerlink" title="环境准备"></a>环境准备</h2><div class="note note-warning">
+            <p>如果拿真实案例来做分析，势必会有一系列繁琐的前期准备步骤，而且一时也想不起来有哪些友商 App 刚好可以做 demo，所以本文将使用本地环境做模拟，并直接从最关键的步骤开始</p>
+          </div>
+
 <ol>
 <li><p>打开 Xcode，新建一个 <code>Single View App</code>，将下面的代码贴入 <code>ViewController.m</code> 中，准备好证书和 64bit 真机。</p>
  <pre><code class="hljs objc"><span class="hljs-meta">#import <span class="hljs-meta-string">"ViewController.h"</span></span>
@@ -250,9 +251,11 @@
 <li><p>按住 <code>Control</code> 键，通过点 <code>Step info</code> 单步执行到第 19 行。<code>objc_msgSend</code> 原型为<code>objc_msgSend(id self, SEL op,...)</code>，本例中有三个参数，按照约定这三个参数将依次放在<code>x0</code>、<code>x1</code>、<code>x2</code> 中。所以 <code>x0</code> 为 <code>ViewController</code> 实例，<code>x1</code> 为 selector，<code>x2</code> 为 block 结构体指针。读取寄存器和打印 <code>x0</code> 可验证：<br> <img src="a3f46529/2.png" srcset="/img/loading.gif" alt=""><br> <img src="a3f46529/3.png" srcset="/img/loading.gif" alt=""></p>
 </li>
 </ol>
-<h2 id="block-类型形参的分析"><a href="#block-类型形参的分析" class="headerlink" title="block 类型形参的分析"></a>block 类型形参的分析</h2><blockquote>
-<p>前面的更多是汇编基础的回顾，现在即将进入重点</p>
-</blockquote>
+<h2 id="block-类型形参的分析"><a href="#block-类型形参的分析" class="headerlink" title="block 类型形参的分析"></a>block 类型形参的分析</h2><div class="note note-danger">
+            <p>前面的更多是汇编基础的回顾，现在即将进入重点</p>
+          </div>
+
+
 <ol>
 <li><p>点 <code>Step over</code> 进入到真正被调用函数，如图：<br> <img src="a3f46529/4.png" srcset="/img/loading.gif" alt=""><br> 按照刚刚的分析，<code>x2</code> 里面就是这个 block 形参，直接 <code>po</code>该形参是没有函数体地址和函数签名等信息的：<br> <img src="a3f46529/5.png" srcset="/img/loading.gif" alt=""></p>
 </li>

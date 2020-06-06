@@ -207,9 +207,10 @@
             
             <article class="markdown-body">
               <p><a href="https://docs.fastlane.tools/actions/match/" target="_blank" rel="noopener">fastlane match</a> 有多香咱就不赘述了，尤其是团队开发和做 CI 时，在开发证书和测试设备管理这两方面使用 fastlane match 能节省不少时间和精力。不过有时候我们会碰到需要重新生成描述文件或重置证书的情况，比如接入 Apple Sign In 功能时，需要在证书中增加对应的能力，必须要更新描述文件时；用于生成原开发证书的本地私钥丢失，不得不重新生成整套证书时。此时 fastlane match 官网并没有明确告诉如何应对，但通过 fastlane match 的工作原理，我们还是可以总结出最佳实践的。</p>
-<blockquote>
-<p>本文假设读者已经在使用 fastlane match，已经会 fastlane match 的基本使用。如果您对 fastlane match 有使用上的问题也欢迎留言交流</p>
-</blockquote>
+<div class="note note-info">
+            <p>本文假设读者已经在使用 fastlane match，已经会 fastlane match 的基本使用。如果您对 fastlane match 有使用上的问题也欢迎留言交流</p>
+          </div>
+
 <p>下面分两种情况介绍步骤，一种是需要重置证书，一种是需要重置<code>mobileprovision</code>。</p>
 <h1 id="重置证书"><a href="#重置证书" class="headerlink" title="重置证书"></a>重置证书</h1><ol>
 <li>删除 ITC 后台中需要被重置的证书，包括 <code>development</code> 和 <code>distribution</code> 类型的。注意，此步骤不影响已上线的 App 和通过 TestFlight 分发的 App，但是会影响已发布的测试版本 App，插线 Debug 版的和 AdHoc 版本的 App 在联网时将启动即闪退</li>
