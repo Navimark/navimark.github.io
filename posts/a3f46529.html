@@ -13,6 +13,8 @@
         content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
   <meta http-equiv="x-ua-compatible" content="ie=edge">
   
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  
   <meta name="theme-color" content="#2f4154">
   <meta name="description" content="汇编底层学习开发技巧 iOS">
   <meta name="author" content="Navimark">
@@ -261,7 +263,7 @@
 </li>
 <li><p>尝试还原 block 信息，按行分析：<br> L3. <code>ldr    x3, [x2, #0x10]</code>: 将 <code>x2</code> 指向的内容加上 16 个字节偏移后的地址，加载到<code>x3</code>中<br> L4. <code>adr    x1, #0x1d94</code>: 将 <code>#0x1d94</code> 指向的内容加载到 <code>x1</code><br> L5. 同上<br> L6. <code>mov    w2, #0x2766</code>: 将 <code>#0x2766</code> 复制到 <code>w2</code> 的低 32 位上。<code>0x2766</code> 也就是十进制的 <code>10086</code><br> L7. <code>br     x3</code>: 跳转到 <code>x3</code> 指向的地址上执行</p>
 </li>
-<li><p>根据上下文，第 2 行中的 <code>x2</code> 中就是 block 形参指针（<code>0x0000000100584090</code>），在第 3 行中，取了该指针指向内容并偏移 <code>0x10</code> 处的地址 P 赋值给了 <code>x3</code>，在第 7 行中执行了 <code>x3</code> 指向的内容（也是一个地址），说明 P 是一个函数（函数指针）可被执行，这正是 block 的特性。参考 <a href="https://navimark.github.io/2020/05/08/you-block-de-nei-cun-bu-ju-yan-sheng-er-lai-de-mian-shi-ti/">由 block 的内存布局衍生而来的面试题</a></p>
+<li><p>根据上下文，第 2 行中的 <code>x2</code> 中就是 block 形参指针（<code>0x0000000100584090</code>），在第 3 行中，取了该指针指向内容并偏移 <code>0x10</code> 处的地址 P 赋值给了 <code>x3</code>，在第 7 行中执行了 <code>x3</code> 指向的内容（也是一个地址），说明 P 是一个函数（函数指针）可被执行，这正是 block 的特性。参考 <a href="https://navimark.github.io/2020/05/08/you-block-de-nei-cun-bu-ju-yan-sheng-er-lai-de-mian-shi-ti/" target="_blank" rel="noopener">由 block 的内存布局衍生而来的面试题</a></p>
 </li>
 <li><p>根据 <a href="http://clang.llvm.org/docs/Block-ABI-Apple.html" target="_blank" rel="noopener">llvm 官网对 block 实施标准的描述</a>：</p>
  <pre><code class="hljs objc"><span class="hljs-keyword">struct</span> Block_literal_1 &#123;

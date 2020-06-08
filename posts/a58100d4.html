@@ -13,6 +13,8 @@
         content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
   <meta http-equiv="x-ua-compatible" content="ie=edge">
   
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  
   <meta name="theme-color" content="#2f4154">
   <meta name="description" content="汇编底层学习开发技巧 iOS">
   <meta name="author" content="Navimark">
@@ -448,7 +450,7 @@ uint32_t lc_offset = <span class="hljs-keyword">sizeof</span>(<span class="hljs-
 <h1 id="一点感触"><a href="#一点感触" class="headerlink" title="一点感触"></a>一点感触</h1><p>读取 Mach-O 文件的精髓是偏移 + <code>struct</code>，<code>struct</code> 真是访问字节流内容的神器：</p>
 <ul>
 <li>在探索 oc 底层结构时，打印 <code>Class</code> 类型的 <code>isa</code> 指针时，由于某些原因（暂时未知）不能直接 lldb po 出来，这时可以<a href="[iOS底层原理之六：isa指针实现之ISA_MASK](https://www.jianshu.com/p/8275a6f15bfc)">定义一个和类对象一样结构的结构体来套取 <code>isa</code> 指针</a>。</li>
-<li><a href="https://navimark.github.io/2020/05/16/cong-hui-bian-li-jie-block-de-nei-cun-jie-gou/">oc 的 <code>block</code> 转成 c++ 代码后</a>，有一个代表 block 的基本结构的类型 <code>struct __block_impl</code>:  <pre><code class="hljs c++"><span class="hljs-class"><span class="hljs-keyword">struct</span> __<span class="hljs-title">block_impl</span> &#123;</span>
+<li><a href="https://navimark.github.io/2020/05/16/cong-hui-bian-li-jie-block-de-nei-cun-jie-gou/" target="_blank" rel="noopener">oc 的 <code>block</code> 转成 c++ 代码后</a>，有一个代表 block 的基本结构的类型 <code>struct __block_impl</code>:  <pre><code class="hljs c++"><span class="hljs-class"><span class="hljs-keyword">struct</span> __<span class="hljs-title">block_impl</span> &#123;</span>
 	<span class="hljs-keyword">void</span> *isa;
 	<span class="hljs-keyword">int</span> Flags;
 	<span class="hljs-keyword">int</span> Reserved;
@@ -508,9 +510,9 @@ uint32_t lc_offset = <span class="hljs-keyword">sizeof</span>(<span class="hljs-
                   <div class="post-prev col-6">
                     
                     
-                      <a href="/posts/a5ddcb7c.html">
+                      <a href="/posts/feb5cc21.html">
                         <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">Mach-O 加载时的符号整理过程</span>
+                        <span class="hidden-mobile">Fastlane Match 如何重置证书/描述文件</span>
                         <span class="visible-mobile">上一篇</span>
                       </a>
                     
