@@ -4,6 +4,31 @@
   
   
   <entry>
+    <title>给 GitHub Pages 博客绑定免费的个人域名</title>
+    <link href="/posts/f5d9b671.html"/>
+    <url>/posts/f5d9b671.html</url>
+    
+    <content type="html"><![CDATA[<div class="note note-success"><p>🎉🎉咱也有顶级域名了！</p></div><p>本文将记录 GitHub Pages 绑定域名的过程</p><h1 id="域名申请"><a href="#域名申请" class="headerlink" title="域名申请"></a>域名申请</h1><p><a href="https://www.freenom.com/" target="_blank" rel="noopener">Freenom</a> 是世界上第一个也是唯一的免费域名提供商，但是这家好像是不允许来自大陆的注册和续期了，而且新注册的也需要科学上网才行，所以下面的操作需要首先“云游”到外国，并且在填写注册所需的各种资料时要表现得像一个真人，以免被 Freenom 误判为机器人而申请失败。</p><ol><li>首先开启全局代理。一开始是打算为 <code>freenom.com</code> 制定规则，避免xxxx，后来担心里面的 js、啥啥啥的有问题，就开全局了</li><li>打开 Chrome 浏览器，新创建一个无痕窗口访问 <code>https://www.freenom.com</code>，输入意向的<strong>完整</strong>域名后点击 Check Availability，如果可用将如图展示：<br><img src="f5d9b671/1.png" srcset="/img/loading.gif" alt="图片"></li><li>点击 Checkout 后可以选择生效期，在 Period 中选择 <code>12 Months @ FREE</code> 然后 Continue<br><img src="f5d9b671/2.png" srcset="/img/loading.gif" alt="图片"></li><li>接下来填写邮箱地址（这个地址将成为 <code>Freenom</code> 账号登录名），既然已经云游到国外了，这里最好是填国外的邮箱服务商的邮箱地址吧，如 gmail.com 。填好后点击 Verify My Email Adress，然后到邮箱中去点击验证链接<br><img src="f5d9b671/3.png" srcset="/img/loading.gif" alt="图片"></li><li>点击验证链接后，需要填入地址信息，这里的地址需要“云游”服务器的 IP 地址所在的地址。<br><img src="f5d9b671/4.png" srcset="/img/loading.gif" alt="图片"><ol><li>访问<a class="btn" href="https://ip.sb" title="IP 查询" target="_blank">ip.sb</a>查询到“云游” IP 所在地，然后去 Google Maps 搜索到所在地的地址信息。如果 IP 在美国，建议从<a href="http://www.shenfendaquan.com/Index/index/us_top_1000_company" target="_blank" rel="noopener">这里</a>获取需要的信息</li><li>逐一填写上述得到的地址信息，填写密码</li><li>提交。不出意外的话，点击 Freenom 首页 -&gt; Services -&gt; My Domains 就能看到注册的域名了<br><img src="f5d9b671/5.png" srcset="/img/loading.gif" alt="图片"><br><img src="f5d9b671/6.png" srcset="/img/loading.gif" alt="图片"><div class="note note-success"><ul><li>只能在域名到期前 14 天续费（<a href="http://www.freenom.com/zh/freeandpaiddomains.html" target="_blank" rel="noopener">免费更新的</a>），建议设置提醒事件，避免来年忘记续费时间点</li><li>后期可以给 <code>freenom.com</code> 和 <code>*.freenom.com</code> 新添加 PAC 规则，让它们被转发:</li></ul></div></li></ol></li></ol><h1 id="DNS-解析"><a href="#DNS-解析" class="headerlink" title="DNS 解析"></a>DNS 解析</h1><p>进入域名列表后，依次点击选定域名的 Manage Domins -&gt; Manage Freenom DNS，然后填入如下规则<br><img src="f5d9b671/9.png" srcset="/img/loading.gif" alt="图片"><br>其中 IP 地址的由来：<a href="https://help.github.com/en/github/working-with-github-pages/managing-a-custom-domain-for-your-github-pages-site" target="_blank" rel="noopener">Managing a custom domain for your GitHub Pages site</a></p><h1 id="GitHub-Pages-设置"><a href="#GitHub-Pages-设置" class="headerlink" title="GitHub Pages 设置"></a>GitHub Pages 设置</h1><ol><li>进入 GitHub 上托管 Pages 仓库的 Setting 页面，找到 GitHub Pages 设置区域，在 Custom domain 中填入域名，注意不需要 http(s) 前缀，然后点保存。保存完毕后仓库的根目录下会新增加一个 <code>CNAME</code> 文件，内容为 <code>alphabyte.tk</code>，这个 <code>CNAME</code> 指导 github 是否要定向到 <code>alphabyte.tk</code></li><li>随着 DNS 服务器的递归索引的建立，等上几分钟或者几个小时，通过 <code>https://alphabyte.tk/</code> 或 <code>https://www.alphabyte.tk/</code> 就能访问到博客啦。可以在命令行执行 <code>dig alphabyte.tk</code> 命令来检测 DNS 解析是否生效。</li></ol><h1 id="Hexo-设置"><a href="#Hexo-设置" class="headerlink" title="Hexo 设置"></a>Hexo 设置</h1><p>由于每次发表文章部署 Pages 时，Pages 主页的内容都是被全量清除并覆盖的，<code>CNAME</code> 文件也将被清除，所以肯定需要让 hexo 能够管理这个 <code>CNAME</code> 文件的，所以还需要对 hexo 进行一些处理：在 hexo 主题的 source 目录下创建一个 <code>CNAME</code> 文本文件，内容为 <code>alphabyte.tk</code>，然后在 <code>_config.yml</code> 中设置<code>CNAME</code> 跳过渲染 <code>skip_render: CNAME</code>，这样每次部署博客时，<code>CNAME</code> 将会被拷贝到网站根目录。</p><h1 id="接下来"><a href="#接下来" class="headerlink" title="接下来"></a>接下来</h1><ol><li>Freenom 的 DNS 解析服务在大陆访问的延迟比较高，可以考虑接入其他更专业的第三方 DNS 服务商</li><li>由于有了顶级私有域名，现在可以定制专属 404 页面了</li><li>提交给百度收录</li></ol>]]></content>
+    
+    
+    <categories>
+      
+      <category>博客装修</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>装修</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>Fastlane Match 如何重置证书/描述文件</title>
     <link href="/posts/feb5cc21.html"/>
     <url>/posts/feb5cc21.html</url>
