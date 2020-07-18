@@ -1,146 +1,146 @@
 <!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><link rel="apple-touch-icon" sizes="76x76" href="/img/apple-touch-icon.png"><link rel="icon" type="image/png" href="/img/favicon.png"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,shrink-to-fit=no"><meta http-equiv="x-ua-compatible" content="ie=edge"><meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests"><meta name="theme-color" content="#2f4154"><meta name="description" content="汇编底层学习开发技巧 iOS"><meta name="author" content="Navimark"><meta name="keywords" content="iOS,Python,Swift,底层,汇编"><title>如何快速更换 App icon - 子非鱼</title><link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/css/bootstrap.min.css"><link rel="stylesheet" href="https://cdn.staticfile.org/github-markdown-css/4.0.0/github-markdown.min.css"><link rel="stylesheet" href="/lib/hint/hint.min.css"><link rel="stylesheet" href="https://cdn.staticfile.org/highlight.js/10.0.0/styles/xcode.min.css"><link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_yg9cfy8wd6.css"><link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_pjno9b9zyxs.css"><link rel="stylesheet" href="/css/main.css"><script src="/js/utils.js"></script><meta name="generator" content="Hexo 4.2.1"></head><body><header style="height:50vh"><nav id="navbar" class="navbar fixed-top navbar-expand-lg navbar-dark scrolling-navbar"><div class="container"><a class="navbar-brand" href="/">&nbsp;<strong>子非鱼</strong>&nbsp;</a> <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><div class="animated-icon"><span></span><span></span><span></span></div></button><div class="collapse navbar-collapse" id="navbarSupportedContent"><ul class="navbar-nav ml-auto text-center"><li class="nav-item"><a class="nav-link" href="/"><i class="iconfont icon-home-fill"></i> 首页</a></li><li class="nav-item"><a class="nav-link" href="/archives/"><i class="iconfont icon-archive-fill"></i> 归档</a></li><li class="nav-item"><a class="nav-link" href="/categories/"><i class="iconfont icon-category-fill"></i> 分类</a></li><li class="nav-item"><a class="nav-link" href="/tags/"><i class="iconfont icon-tags-fill"></i> 标签</a></li><li class="nav-item"><a class="nav-link" href="/about/"><i class="iconfont icon-user-fill"></i> 关于</a></li><li class="nav-item" id="search-btn"><a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;&nbsp;<i class="iconfont icon-search"></i>&nbsp;&nbsp;</a></li></ul></div></div></nav><div class="view intro-2" id="background" parallax="true" style="background:url(https://bing.ioliu.cn/v1/rand/) no-repeat center center;background-size:cover"><div class="full-bg-img"><div class="mask flex-center" style="background-color:rgba(0,0,0,.3)"><div class="container text-center white-text fadeInUp"><span class="h2" id="subtitle">如何快速更换 App icon</span><div class="mt-3 post-meta"><i class="iconfont icon-date-fill" aria-hidden="true"></i> <time datetime="2020-05-05 14:42">2020年5月5日 下午</time></div><div class="mt-1"><span class="post-meta mr-2"><i class="iconfont icon-chart"></i> 1.3k 字 </span><span class="post-meta mr-2"><i class="iconfont icon-clock-fill"></i> 18 分钟</span></div></div></div></div></div></header><main><div class="container-fluid"><div class="row"><div class="d-none d-lg-block col-lg-2"></div><div class="col-lg-8 nopadding-md"><div class="container nopadding-md" id="board-ctn"><div class="py-5" id="board"><div class="post-content mx-auto" id="post"><article class="markdown-body"><blockquote><p>每逢重大节日，App icon 就要跟一波“潮流”做一次更换，节日过后再换回普通。如何保证这两次切换流程丝滑顺畅呢？</p></blockquote><p>应用内需要更换的 icon 包括两处，一个是 App 主 icon，默认放在 <code>xcassets</code> 里面，另一个就是 App 内部页面所使用的 icon。</p><h1 id="App-主-icon-更换"><a href="#App-主-icon-更换" class="headerlink" title="App 主 icon 更换"></a>App 主 icon 更换</h1><p>苹果这边需要的 icon 实在太多了，如果像我们 App 一样支持 iPad 那么大大小小的 icon 就需要 18 张，就算让设计师同学给到所有需要的尺寸我们自己在 <code>.xcassets</code> 一一对应起来也是超级麻烦，如果我们只需要提供一张高清图（1024x1024 pixel）剩下的能通过工具自动对应起来该多好啊！</p><p>研究<code>xcassets</code>结构后发现，AppIcon 类型的图片是一个后缀名为 <code>appiconset</code> 的文件夹，该文件夹里面除了有 APP 需要的各种尺寸的 <code>png</code> 图片外，还有一个 <code>Contents.json</code> 文件，形如：</p><pre><code class="hljs json">&#123;
-  <span class="hljs-attr">"images"</span> : [
+  <div class="hljs-attr">"images" : [
     &#123;
-      <span class="hljs-attr">"size"</span> : <span class="hljs-string">"20x20"</span>,
-      <span class="hljs-attr">"idiom"</span> : <span class="hljs-string">"iphone"</span>,
-      <span class="hljs-attr">"filename"</span> : <span class="hljs-string">"IOS_40-2.png"</span>,
-      <span class="hljs-attr">"scale"</span> : <span class="hljs-string">"2x"</span>
+      <div class="hljs-attr">"size" : <div class="hljs-string">"20x20",
+      <div class="hljs-attr">"idiom" : <div class="hljs-string">"iphone",
+      <div class="hljs-attr">"filename" : <div class="hljs-string">"IOS_40-2.png",
+      <div class="hljs-attr">"scale" : <div class="hljs-string">"2x"
     &#125;,
     &#123;
-      <span class="hljs-attr">"size"</span> : <span class="hljs-string">"83.5x83.5"</span>,
-      <span class="hljs-attr">"idiom"</span> : <span class="hljs-string">"ipad"</span>,
-      <span class="hljs-attr">"filename"</span> : <span class="hljs-string">"IOS_167.png"</span>,
-      <span class="hljs-attr">"scale"</span> : <span class="hljs-string">"2x"</span>
+      <div class="hljs-attr">"size" : <div class="hljs-string">"83.5x83.5",
+      <div class="hljs-attr">"idiom" : <div class="hljs-string">"ipad",
+      <div class="hljs-attr">"filename" : <div class="hljs-string">"IOS_167.png",
+      <div class="hljs-attr">"scale" : <div class="hljs-string">"2x"
     &#125;,
     &#123;
-      <span class="hljs-attr">"size"</span> : <span class="hljs-string">"1024x1024"</span>,
-      <span class="hljs-attr">"idiom"</span> : <span class="hljs-string">"ios-marketing"</span>,
-      <span class="hljs-attr">"filename"</span> : <span class="hljs-string">"IOS_1024.png"</span>,
-      <span class="hljs-attr">"scale"</span> : <span class="hljs-string">"1x"</span>
+      <div class="hljs-attr">"size" : <div class="hljs-string">"1024x1024",
+      <div class="hljs-attr">"idiom" : <div class="hljs-string">"ios-marketing",
+      <div class="hljs-attr">"filename" : <div class="hljs-string">"IOS_1024.png",
+      <div class="hljs-attr">"scale" : <div class="hljs-string">"1x"
     &#125;
   ],
-  <span class="hljs-attr">"info"</span> : &#123;
-    <span class="hljs-attr">"version"</span> : <span class="hljs-number">1</span>,
-    <span class="hljs-attr">"author"</span> : <span class="hljs-string">"xcode"</span>
+  <div class="hljs-attr">"info" : &#123;
+    <div class="hljs-attr">"version" : <div class="hljs-number">1,
+    <div class="hljs-attr">"author" : <div class="hljs-string">"xcode"
   &#125;
-&#125;</code></pre><p>描述了了各种尺寸的图片如何与文件夹中的 <code>png</code> 图片对应，我们按照此规律便可以写一个更换 AppIcon 的工具。</p><p>之前确实听说过有自动生成这种 icon 的工具 App 但我没有使用过，要为如此一个小功能下载一个 App 我觉得太不环保了。还是自己写一个脚本实现比较低碳。下面是 python 程序和注释</p><pre><code class="hljs python"><span class="hljs-comment"># !/usr/local/bin/python3</span>
-<span class="hljs-comment"># _*_ coding:utf-8 _*_</span>
+&#125;</div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></code></pre><p>描述了了各种尺寸的图片如何与文件夹中的 <code>png</code> 图片对应，我们按照此规律便可以写一个更换 AppIcon 的工具。</p><p>之前确实听说过有自动生成这种 icon 的工具 App 但我没有使用过，要为如此一个小功能下载一个 App 我觉得太不环保了。还是自己写一个脚本实现比较低碳。下面是 python 程序和注释</p><pre><code class="hljs python"><div class="hljs-comment"># !/usr/local/bin/python3
+<div class="hljs-comment"># _*_ coding:utf-8 _*_
 
-__doc__=<span class="hljs-string">"""</span>
-<span class="hljs-string">    输入：一个 1024*1024 的 png 图片</span>
-<span class="hljs-string">    输出： AppIconxxxxx.appiconset 目录，包含 iPhone 和 iPad 所需的 App Icons</span>
-<span class="hljs-string">"""</span>
+__doc__=<div class="hljs-string">"""
+<div class="hljs-string">    输入：一个 1024*1024 的 png 图片
+<div class="hljs-string">    输出： AppIconxxxxx.appiconset 目录，包含 iPhone 和 iPad 所需的 App Icons
+<div class="hljs-string">"""
 
-<span class="hljs-keyword">import</span> os,sys
-<span class="hljs-keyword">import</span> imghdr
-<span class="hljs-keyword">import</span> json
-<span class="hljs-keyword">import</span> random,shutil
+<div class="hljs-keyword">import os,sys
+<div class="hljs-keyword">import imghdr
+<div class="hljs-keyword">import json
+<div class="hljs-keyword">import random,shutil
 
-<span class="hljs-keyword">from</span> PIL <span class="hljs-keyword">import</span> Image,ImageFile
+<div class="hljs-keyword">from PIL <div class="hljs-keyword">import Image,ImageFile
 
-<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">FileSet</span>:</span>
-    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__init__</span><span class="hljs-params">(self,filename,scale)</span>:</span>
+<div class="hljs-class"><div class="hljs-keyword">class <div class="hljs-title">FileSet:
+    <div class="hljs-function"><div class="hljs-keyword">def <div class="hljs-title">__init__<div class="hljs-params">(self,filename,scale):
         self.filename = filename
         self.scale = scale
     
-<span class="hljs-meta">    @classmethod</span>
-    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">fileset</span><span class="hljs-params">(cls,scale,size,prefix)</span>:</span>
-        filename = <span class="hljs-string">"&#123;&#125;.&#123;&#125;.&#123;&#125;.png"</span>.format(size,scale,prefix)
+<div class="hljs-meta">    @classmethod
+    <div class="hljs-function"><div class="hljs-keyword">def <div class="hljs-title">fileset<div class="hljs-params">(cls,scale,size,prefix):
+        filename = <div class="hljs-string">"&#123;&#125;.&#123;&#125;.&#123;&#125;.png".format(size,scale,prefix)
         file_set = FileSet(filename,scale)
-        <span class="hljs-keyword">return</span> file_set
+        <div class="hljs-keyword">return file_set
 
-<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ImageSet</span>:</span>
-    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__init__</span><span class="hljs-params">(self,size,idiom,filesets)</span>:</span>
-        self.size = size    <span class="hljs-comment"># 单边</span>
+<div class="hljs-class"><div class="hljs-keyword">class <div class="hljs-title">ImageSet:
+    <div class="hljs-function"><div class="hljs-keyword">def <div class="hljs-title">__init__<div class="hljs-params">(self,size,idiom,filesets):
+        self.size = size    <div class="hljs-comment"># 单边
         self.idiom = idiom  
-        self.filesets = filesets    <span class="hljs-comment"># 数组，包含文件名，一个 size 可能有多个 scale，所有会有多个文件 set</span>
-    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">json_desc</span><span class="hljs-params">(self)</span>:</span>
+        self.filesets = filesets    <div class="hljs-comment"># 数组，包含文件名，一个 size 可能有多个 scale，所有会有多个文件 set
+    <div class="hljs-function"><div class="hljs-keyword">def <div class="hljs-title">json_desc<div class="hljs-params">(self):
         descs = []
-        <span class="hljs-keyword">for</span> fileset <span class="hljs-keyword">in</span> self.filesets:
-            json_dict = &#123;<span class="hljs-string">"size"</span>:<span class="hljs-string">"&#123;&#125;x&#123;&#125;"</span>.format(self.size,self.size),
-                        <span class="hljs-string">"idiom"</span>:self.idiom,
-                        <span class="hljs-string">"filename"</span>:fileset.filename,
-                        <span class="hljs-string">"scale"</span>:<span class="hljs-string">"&#123;&#125;x"</span>.format(fileset.scale)&#125;
+        <div class="hljs-keyword">for fileset <div class="hljs-keyword">in self.filesets:
+            json_dict = &#123;<div class="hljs-string">"size":<div class="hljs-string">"&#123;&#125;x&#123;&#125;".format(self.size,self.size),
+                        <div class="hljs-string">"idiom":self.idiom,
+                        <div class="hljs-string">"filename":fileset.filename,
+                        <div class="hljs-string">"scale":<div class="hljs-string">"&#123;&#125;x".format(fileset.scale)&#125;
             descs.append(json_dict)
-        <span class="hljs-keyword">return</span> descs
+        <div class="hljs-keyword">return descs
 
-<span class="hljs-meta">    @classmethod</span>
-    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">iPhone_set</span><span class="hljs-params">(cls,size,filesets)</span>:</span>
-        <span class="hljs-keyword">return</span> ImageSet(size,<span class="hljs-string">'iphone'</span>,filesets)
-<span class="hljs-meta">    @classmethod</span>
-    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">iPad_set</span><span class="hljs-params">(cls,size,filesets)</span>:</span>
-        <span class="hljs-keyword">return</span> ImageSet(size,<span class="hljs-string">'ipad'</span>,filesets)
+<div class="hljs-meta">    @classmethod
+    <div class="hljs-function"><div class="hljs-keyword">def <div class="hljs-title">iPhone_set<div class="hljs-params">(cls,size,filesets):
+        <div class="hljs-keyword">return ImageSet(size,<div class="hljs-string">'iphone',filesets)
+<div class="hljs-meta">    @classmethod
+    <div class="hljs-function"><div class="hljs-keyword">def <div class="hljs-title">iPad_set<div class="hljs-params">(cls,size,filesets):
+        <div class="hljs-keyword">return ImageSet(size,<div class="hljs-string">'ipad',filesets)
 
-<span class="hljs-meta">    @classmethod</span>
-    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">market_set</span><span class="hljs-params">(cls,file_prefix=<span class="hljs-string">''</span>)</span>:</span>
-        size = <span class="hljs-number">1024</span>
-        <span class="hljs-keyword">return</span> ImageSet(size,idiom=<span class="hljs-string">'ios-marketing'</span>,filesets=[FileSet.fileset(<span class="hljs-number">1</span>,size,file_prefix)])
+<div class="hljs-meta">    @classmethod
+    <div class="hljs-function"><div class="hljs-keyword">def <div class="hljs-title">market_set<div class="hljs-params">(cls,file_prefix=<div class="hljs-string">''):
+        size = <div class="hljs-number">1024
+        <div class="hljs-keyword">return ImageSet(size,idiom=<div class="hljs-string">'ios-marketing',filesets=[FileSet.fileset(<div class="hljs-number">1,size,file_prefix)])
 
-<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">get_img_sets</span><span class="hljs-params">(iPad=False,iPhone=False,file_prefix=<span class="hljs-string">''</span>)</span>:</span>
+<div class="hljs-function"><div class="hljs-keyword">def <div class="hljs-title">get_img_sets<div class="hljs-params">(iPad=False,iPhone=False,file_prefix=<div class="hljs-string">''):
     img_sets = []
-    <span class="hljs-keyword">if</span> iPad:
-        <span class="hljs-keyword">for</span> size <span class="hljs-keyword">in</span> [<span class="hljs-number">20</span>,<span class="hljs-number">29</span>,<span class="hljs-number">40</span>,<span class="hljs-number">76</span>]:
-            file_sets = [FileSet.fileset(<span class="hljs-number">2</span>,size,file_prefix),FileSet.fileset(<span class="hljs-number">1</span>,size,file_prefix)]
+    <div class="hljs-keyword">if iPad:
+        <div class="hljs-keyword">for size <div class="hljs-keyword">in [<div class="hljs-number">20,<div class="hljs-number">29,<div class="hljs-number">40,<div class="hljs-number">76]:
+            file_sets = [FileSet.fileset(<div class="hljs-number">2,size,file_prefix),FileSet.fileset(<div class="hljs-number">1,size,file_prefix)]
             one_set = ImageSet.iPad_set(size,file_sets)
             img_sets.append(one_set)
-        img_sets.append(ImageSet.iPad_set(<span class="hljs-number">83.5</span>,[FileSet.fileset(<span class="hljs-number">2</span>,<span class="hljs-number">83.5</span>,file_prefix)]))        
-    <span class="hljs-keyword">if</span> iPhone:
-        <span class="hljs-keyword">for</span> size <span class="hljs-keyword">in</span> [<span class="hljs-number">20</span>,<span class="hljs-number">29</span>,<span class="hljs-number">40</span>,<span class="hljs-number">60</span>]:
-            file_sets = [FileSet.fileset(<span class="hljs-number">2</span>,size,file_prefix),FileSet.fileset(<span class="hljs-number">3</span>,size,file_prefix)]
+        img_sets.append(ImageSet.iPad_set(<div class="hljs-number">83.5,[FileSet.fileset(<div class="hljs-number">2,<div class="hljs-number">83.5,file_prefix)]))        
+    <div class="hljs-keyword">if iPhone:
+        <div class="hljs-keyword">for size <div class="hljs-keyword">in [<div class="hljs-number">20,<div class="hljs-number">29,<div class="hljs-number">40,<div class="hljs-number">60]:
+            file_sets = [FileSet.fileset(<div class="hljs-number">2,size,file_prefix),FileSet.fileset(<div class="hljs-number">3,size,file_prefix)]
             one_set = ImageSet.iPhone_set(size,file_sets)
             img_sets.append(one_set)
     img_sets.append(ImageSet.market_set(file_prefix))
-    <span class="hljs-keyword">return</span> img_sets
+    <div class="hljs-keyword">return img_sets
 
-<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">create_appicon_set</span><span class="hljs-params">(imgobj,t_path=<span class="hljs-string">''</span>,iPad=False,iPhone=True)</span>:</span>
-    rand_str = str(random.randint(<span class="hljs-number">20000</span>,<span class="hljs-number">2147483648</span>))
-    t_folder_path = os.path.join(t_path,<span class="hljs-string">"AppIcon"</span>+ rand_str +<span class="hljs-string">".appiconset"</span>)
+<div class="hljs-function"><div class="hljs-keyword">def <div class="hljs-title">create_appicon_set<div class="hljs-params">(imgobj,t_path=<div class="hljs-string">'',iPad=False,iPhone=True):
+    rand_str = str(random.randint(<div class="hljs-number">20000,<div class="hljs-number">2147483648))
+    t_folder_path = os.path.join(t_path,<div class="hljs-string">"AppIcon"+ rand_str +<div class="hljs-string">".appiconset")
     os.makedirs(t_folder_path)
     img_sets = get_img_sets(iPad=iPad,iPhone=iPhone,file_prefix=rand_str)
-    contents = &#123;<span class="hljs-string">"info"</span>:&#123;<span class="hljs-string">"version"</span>:<span class="hljs-number">1</span>,<span class="hljs-string">"author"</span>:<span class="hljs-string">"xcode"</span>&#125;&#125;
+    contents = &#123;<div class="hljs-string">"info":&#123;<div class="hljs-string">"version":<div class="hljs-number">1,<div class="hljs-string">"author":<div class="hljs-string">"xcode"&#125;&#125;
     images = []
-    <span class="hljs-keyword">for</span> single_set <span class="hljs-keyword">in</span> img_sets:
-        <span class="hljs-keyword">for</span> fileset <span class="hljs-keyword">in</span> single_set.filesets:
+    <div class="hljs-keyword">for single_set <div class="hljs-keyword">in img_sets:
+        <div class="hljs-keyword">for fileset <div class="hljs-keyword">in single_set.filesets:
             scale_size = (int(single_set.size * fileset.scale), int(single_set.size * fileset.scale))
             img_obj = imgobj.resize(scale_size,Image.ANTIALIAS)
             real_path = os.path.join(t_folder_path,fileset.filename)
             img_obj.save(real_path)
-            print(<span class="hljs-string">"保存文件&#123;&#125;,\t路径:&#123;&#125;"</span>.format(scale_size,real_path))
+            print(<div class="hljs-string">"保存文件&#123;&#125;,\t路径:&#123;&#125;".format(scale_size,real_path))
         images += single_set.json_desc()
-    contents[<span class="hljs-string">"images"</span>] = images
-    <span class="hljs-keyword">with</span> open(os.path.join(t_folder_path,<span class="hljs-string">"Contents.json"</span>),<span class="hljs-string">"w"</span>) <span class="hljs-keyword">as</span> wf:
-        wf.write(json.dumps(contents,indent=<span class="hljs-number">4</span>))
+    contents[<div class="hljs-string">"images"] = images
+    <div class="hljs-keyword">with open(os.path.join(t_folder_path,<div class="hljs-string">"Contents.json"),<div class="hljs-string">"w") <div class="hljs-keyword">as wf:
+        wf.write(json.dumps(contents,indent=<div class="hljs-number">4))
 
-<span class="hljs-keyword">if</span> __name__ == <span class="hljs-string">'__main__'</span>:
+<div class="hljs-keyword">if __name__ == <div class="hljs-string">'__main__':
 
-    argvs = sys.argv[<span class="hljs-number">1</span>:] <span class="hljs-keyword">if</span> len(sys.argv) == <span class="hljs-number">3</span> <span class="hljs-keyword">else</span> <span class="hljs-literal">None</span>
-    <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> argvs:
-        print(<span class="hljs-string">"Fatal: 要求两个参数，第一个是图片路径，第二个是目标目录"</span>)
-        sys.exit(<span class="hljs-number">-1</span>)
+    argvs = sys.argv[<div class="hljs-number">1:] <div class="hljs-keyword">if len(sys.argv) == <div class="hljs-number">3 <div class="hljs-keyword">else <div class="hljs-literal">None
+    <div class="hljs-keyword">if <div class="hljs-keyword">not argvs:
+        print(<div class="hljs-string">"Fatal: 要求两个参数，第一个是图片路径，第二个是目标目录")
+        sys.exit(<div class="hljs-number">-1)
 
     o_img_path,t_path = argvs
     
-    <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> os.path.isfile(o_img_path) <span class="hljs-keyword">or</span> <span class="hljs-keyword">not</span> imghdr.what(o_img_path) <span class="hljs-keyword">in</span> [<span class="hljs-string">'png'</span>]:
-        print(<span class="hljs-string">"Fatal: 图片路径不存在或者非 png 格式图片"</span>)
-        sys.exit(<span class="hljs-number">-1</span>)
+    <div class="hljs-keyword">if <div class="hljs-keyword">not os.path.isfile(o_img_path) <div class="hljs-keyword">or <div class="hljs-keyword">not imghdr.what(o_img_path) <div class="hljs-keyword">in [<div class="hljs-string">'png']:
+        print(<div class="hljs-string">"Fatal: 图片路径不存在或者非 png 格式图片")
+        sys.exit(<div class="hljs-number">-1)
 
-    <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> os.path.isdir(t_path):
-        print(<span class="hljs-string">"Fatal: 目标路径不存在或者非目录"</span>)
-        sys.exit(<span class="hljs-number">-1</span>)
+    <div class="hljs-keyword">if <div class="hljs-keyword">not os.path.isdir(t_path):
+        print(<div class="hljs-string">"Fatal: 目标路径不存在或者非目录")
+        sys.exit(<div class="hljs-number">-1)
 
     o_img = Image.open(o_img_path)
-    <span class="hljs-keyword">if</span> (<span class="hljs-number">1024</span>,<span class="hljs-number">1024</span>) != o_img.size :
-        print(<span class="hljs-string">"Fatal: 图片非 1024x1024 pixel 尺寸"</span>)
-        sys.exit(<span class="hljs-number">-1</span>)
-<span class="hljs-string">"""</span>
-<span class="hljs-string">碰到设计师犯糊，将肉眼看不见但确实带有 Alpha 通道的图片提供给我们，直到我们在提交 App Store 的那一刻苹果报错说带有 Alpha 通道，然后我们又要重新走一遍流程🐶。</span>
-<span class="hljs-string">下面会检查该 1024*1024 的图片是否存在 alpha 通道，若存在，移除之</span>
-<span class="hljs-string">"""</span>
-    <span class="hljs-keyword">if</span> o_img.getbands()[<span class="hljs-number">-1</span>] == <span class="hljs-string">'A'</span>:
-        print(<span class="hljs-string">"Info: 包含 alpha 通道，准备移除..."</span>)
-    o_img = o_img.convert(<span class="hljs-string">"RGB"</span>)
+    <div class="hljs-keyword">if (<div class="hljs-number">1024,<div class="hljs-number">1024) != o_img.size :
+        print(<div class="hljs-string">"Fatal: 图片非 1024x1024 pixel 尺寸")
+        sys.exit(<div class="hljs-number">-1)
+<div class="hljs-string">"""
+<div class="hljs-string">碰到设计师犯糊，将肉眼看不见但确实带有 Alpha 通道的图片提供给我们，直到我们在提交 App Store 的那一刻苹果报错说带有 Alpha 通道，然后我们又要重新走一遍流程🐶。
+<div class="hljs-string">下面会检查该 1024*1024 的图片是否存在 alpha 通道，若存在，移除之
+<div class="hljs-string">"""
+    <div class="hljs-keyword">if o_img.getbands()[<div class="hljs-number">-1] == <div class="hljs-string">'A':
+        print(<div class="hljs-string">"Info: 包含 alpha 通道，准备移除...")
+    o_img = o_img.convert(<div class="hljs-string">"RGB")
 
-    create_appicon_set(o_img,t_path=t_path,iPad=<span class="hljs-literal">True</span>)</code></pre><p>假设该程序保存为<code>appicon_generator.py</code>，选择一个目录在终端打开，然后执行命令：<code>$ python3 /path/to/appicon_generator.py /iconimg/path/1024x1024.png /path/to/output</code>，将在 <code>/path/to/output</code> 目录生成一个 <code>AppIconxxxxx.appiconset</code> （<code>xxxxx</code> 是随机数字，增加辨识度避免撞车）目录，将该目录拖动到 <code>.xcassets</code> 文件夹里面，然后在 Xcode 的 Targets -&gt; General -&gt; App Icons and Launch Images 中选择刚刚生成的 AppIcon 即可</p><h1 id="App-内部-icon-更换"><a href="#App-内部-icon-更换" class="headerlink" title="App 内部 icon 更换"></a>App 内部 icon 更换</h1><p>这里没啥好说的，一般出现在“设置”、“关于 XXX” 里面，替换即可</p><h1 id="切换"><a href="#切换" class="headerlink" title="切换"></a>切换</h1><blockquote><p>Git 的每次提交应该只做一件事！</p></blockquote><p>我们更换了 App Icons 和其他需要替换的 icon 后，立即 git 提交一次，本次提交只做一件事，就是切换 icon。等到需要将 icon 还原时，直接 <code>git revert</code> 本次提交，方便快速切换回来</p></article><hr><div><div class="post-metas mb-3"><div class="post-meta mr-3"><i class="iconfont icon-category"></i> <a class="hover-with-bg" href="/categories/%E5%BC%80%E5%8F%91%E6%8A%80%E5%B7%A7/">开发技巧</a></div><div class="post-meta"><i class="iconfont icon-tags"></i> <a class="hover-with-bg" href="/tags/iOS/">iOS</a> <a class="hover-with-bg" href="/tags/Python/">Python</a> <a class="hover-with-bg" href="/tags/%E8%84%9A%E6%9C%AC/">脚本</a></div></div><p class="note note-warning">本博客所有文章除特别声明外，均采用 <a href="https://zh.wikipedia.org/wiki/Wikipedia:CC_BY-SA_3.0%E5%8D%8F%E8%AE%AE%E6%96%87%E6%9C%AC" target="_blank" rel="nofollow noopener noopener">CC BY-SA 3.0协议</a> 。转载请注明出处！</p><div class="post-prevnext row"><div class="post-prev col-6"><a href="/posts/80ce330f.html"><i class="iconfont icon-arrowleft"></i> <span class="hidden-mobile">由 block 的内存布局衍生而来的面试题</span> <span class="visible-mobile">上一篇</span></a></div><div class="post-next col-6"></div></div></div><div class="comments" id="comments"><script type="text/javascript">function loadUtterances(){var t=document.createElement("script");t.setAttribute("src","https://utteranc.es/client.js"),t.defer=!1,t.setAttribute("repo","Navimark/navimark.github.io"),t.setAttribute("issue-term","pathname"),t.setAttribute("label","utterances"),t.setAttribute("theme","github-light"),t.setAttribute("crossorigin","anonymous");var e=document.getElementsByTagName("script")[0];e.parentNode.insertBefore(t,e)}createObserver(loadUtterances,"comments")</script></div></div></div></div></div><div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn"><div id="toc"><p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p><div id="tocbot"></div></div></div></div></div></main><a id="scroll-top-button" href="#" role="button"><i class="iconfont icon-arrowup" aria-hidden="true"></i></a><div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable modal-lg" role="document"><div class="modal-content"><div class="modal-header text-center"><h4 class="modal-title w-100 font-weight-bold">搜索</h4><button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button></div><div class="modal-body mx-3"><div class="md-form mb-5"><input type="text" id="local-search-input" class="form-control validate"> <label data-error="x" data-success="v" for="local-search-input">关键词</label></div><div class="list-group" id="local-search-result"></div></div></div></div></div><footer class="mt-5"><div class="text-center py-3"><div><a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a></div><span id="cnzz_stat_icon_1278975811" style="display:none"></span></div></footer><script src="https://cdn.staticfile.org/jquery/3.4.1/jquery.min.js"></script><script src="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/js/bootstrap.min.js"></script><script src="/js/debouncer.js"></script><script src="/js/main.js"></script><script src="/js/lazyload.js"></script><script defer src="https://cdn.staticfile.org/clipboard.js/2.0.6/clipboard.min.js"></script><script src="/js/clipboard-use.js"></script><script src="https://cdn.staticfile.org/tocbot/4.11.1/tocbot.min.js"></script><script>$(document).ready(function(){var t=$("#board-ctn").offset().top;tocbot.init({tocSelector:"#tocbot",contentSelector:"article.markdown-body",headingSelector:"h1,h2,h3,h4,h5,h6",linkClass:"tocbot-link",activeLinkClass:"tocbot-active-link",listClass:"tocbot-list",isCollapsedClass:"tocbot-is-collapsed",collapsibleClass:"tocbot-is-collapsible",collapseDepth:6,scrollSmooth:!0,headingsOffset:-t}),0<$(".toc-list-item").length&&$("#toc").css("visibility","visible")})</script><script src="https://cdn.staticfile.org/anchor-js/4.2.2/anchor.min.js"></script><script>anchors.options = {
+    create_appicon_set(o_img,t_path=t_path,iPad=<div class="hljs-literal">True)</div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></code></pre><p>假设该程序保存为<code>appicon_generator.py</code>，选择一个目录在终端打开，然后执行命令：<code>$ python3 /path/to/appicon_generator.py /iconimg/path/1024x1024.png /path/to/output</code>，将在 <code>/path/to/output</code> 目录生成一个 <code>AppIconxxxxx.appiconset</code> （<code>xxxxx</code> 是随机数字，增加辨识度避免撞车）目录，将该目录拖动到 <code>.xcassets</code> 文件夹里面，然后在 Xcode 的 Targets -&gt; General -&gt; App Icons and Launch Images 中选择刚刚生成的 AppIcon 即可</p><h1 id="App-内部-icon-更换"><a href="#App-内部-icon-更换" class="headerlink" title="App 内部 icon 更换"></a>App 内部 icon 更换</h1><p>这里没啥好说的，一般出现在“设置”、“关于 XXX” 里面，替换即可</p><h1 id="切换"><a href="#切换" class="headerlink" title="切换"></a>切换</h1><blockquote><p>Git 的每次提交应该只做一件事！</p></blockquote><p>我们更换了 App Icons 和其他需要替换的 icon 后，立即 git 提交一次，本次提交只做一件事，就是切换 icon。等到需要将 icon 还原时，直接 <code>git revert</code> 本次提交，方便快速切换回来</p></article><hr><div><div class="post-metas mb-3"><div class="post-meta mr-3"><i class="iconfont icon-category"></i> <a class="hover-with-bg" href="/categories/%E5%BC%80%E5%8F%91%E6%8A%80%E5%B7%A7/">开发技巧</a></div><div class="post-meta"><i class="iconfont icon-tags"></i> <a class="hover-with-bg" href="/tags/iOS/">iOS</a> <a class="hover-with-bg" href="/tags/Python/">Python</a> <a class="hover-with-bg" href="/tags/%E8%84%9A%E6%9C%AC/">脚本</a></div></div><p class="note note-warning">本博客所有文章除特别声明外，均采用 <a href="https://zh.wikipedia.org/wiki/Wikipedia:CC_BY-SA_3.0%E5%8D%8F%E8%AE%AE%E6%96%87%E6%9C%AC" target="_blank" rel="nofollow noopener noopener">CC BY-SA 3.0协议</a> 。转载请注明出处！</p><div class="post-prevnext row"><div class="post-prev col-6"><a href="/posts/80ce330f.html"><i class="iconfont icon-arrowleft"></i> <span class="hidden-mobile">由 block 的内存布局衍生而来的面试题</span> <span class="visible-mobile">上一篇</span></a></div><div class="post-next col-6"></div></div></div><div class="comments" id="comments"><script type="text/javascript">function loadUtterances(){var t=document.createElement("script");t.setAttribute("src","https://utteranc.es/client.js"),t.defer=!1,t.setAttribute("repo","Navimark/navimark.github.io"),t.setAttribute("issue-term","pathname"),t.setAttribute("label","utterances"),t.setAttribute("theme","github-light"),t.setAttribute("crossorigin","anonymous");var e=document.getElementsByTagName("script")[0];e.parentNode.insertBefore(t,e)}createObserver(loadUtterances,"comments")</script></div></div></div></div></div><div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn"><div id="toc"><p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p><div id="tocbot"></div></div></div></div></div></main><a id="scroll-top-button" href="#" role="button"><i class="iconfont icon-arrowup" aria-hidden="true"></i></a><div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable modal-lg" role="document"><div class="modal-content"><div class="modal-header text-center"><h4 class="modal-title w-100 font-weight-bold">搜索</h4><button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button></div><div class="modal-body mx-3"><div class="md-form mb-5"><input type="text" id="local-search-input" class="form-control validate"> <label data-error="x" data-success="v" for="local-search-input">关键词</label></div><div class="list-group" id="local-search-result"></div></div></div></div></div><footer class="mt-5"><div class="text-center py-3"><div><a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a></div><span id="cnzz_stat_icon_1278975811" style="display:none"></span></div></footer><script src="https://cdn.staticfile.org/jquery/3.4.1/jquery.min.js"></script><script src="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/js/bootstrap.min.js"></script><script src="/js/debouncer.js"></script><script src="/js/main.js"></script><script src="/js/lazyload.js"></script><script defer src="https://cdn.staticfile.org/clipboard.js/2.0.6/clipboard.min.js"></script><script src="/js/clipboard-use.js"></script><script src="https://cdn.staticfile.org/tocbot/4.11.1/tocbot.min.js"></script><script>$(document).ready(function(){var t=$("#board-ctn").offset().top;tocbot.init({tocSelector:"#tocbot",contentSelector:"article.markdown-body",headingSelector:"h1,h2,h3,h4,h5,h6",linkClass:"tocbot-link",activeLinkClass:"tocbot-active-link",listClass:"tocbot-list",isCollapsedClass:"tocbot-is-collapsed",collapsibleClass:"tocbot-is-collapsible",collapseDepth:6,scrollSmooth:!0,headingsOffset:-t}),0<$(".toc-list-item").length&&$("#toc").css("visibility","visible")})</script><script src="https://cdn.staticfile.org/anchor-js/4.2.2/anchor.min.js"></script><script>anchors.options = {
       placement: "right",
       visible: "hover",
       
