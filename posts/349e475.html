@@ -1,0 +1,254 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><link rel="apple-touch-icon" sizes="76x76" href="/img/apple-touch-icon.png"><link rel="icon" type="image/png" href="/img/favicon.png"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,shrink-to-fit=no"><meta http-equiv="x-ua-compatible" content="ie=edge"><meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests"><meta name="theme-color" content="#2f4154"><meta name="description" content="汇编底层学习开发技巧 iOS"><meta name="author" content="Navimark"><meta name="keywords" content="iOS,Python,Swift,底层,汇编"><title>fishhook 原理及其源码阅读 - 子非鱼</title><link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/css/bootstrap.min.css"><link rel="stylesheet" href="https://cdn.staticfile.org/github-markdown-css/4.0.0/github-markdown.min.css"><link rel="stylesheet" href="/lib/hint/hint.min.css"><link rel="stylesheet" href="https://cdn.staticfile.org/highlight.js/10.0.0/styles/xcode.min.css"><link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_yg9cfy8wd6.css"><link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_pjno9b9zyxs.css"><link rel="stylesheet" href="/css/main.css"><script src="/js/utils.js"></script><meta name="generator" content="Hexo 4.2.1"></head><body><header style="height:50vh"><nav id="navbar" class="navbar fixed-top navbar-expand-lg navbar-dark scrolling-navbar"><div class="container"><a class="navbar-brand" href="/">&nbsp;<strong>子非鱼</strong>&nbsp;</a> <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><div class="animated-icon"><span></span><span></span><span></span></div></button><div class="collapse navbar-collapse" id="navbarSupportedContent"><ul class="navbar-nav ml-auto text-center"><li class="nav-item"><a class="nav-link" href="/"><i class="iconfont icon-home-fill"></i> 首页</a></li><li class="nav-item"><a class="nav-link" href="/archives/"><i class="iconfont icon-archive-fill"></i> 归档</a></li><li class="nav-item"><a class="nav-link" href="/categories/"><i class="iconfont icon-category-fill"></i> 分类</a></li><li class="nav-item"><a class="nav-link" href="/tags/"><i class="iconfont icon-tags-fill"></i> 标签</a></li><li class="nav-item"><a class="nav-link" href="/about/"><i class="iconfont icon-user-fill"></i> 关于</a></li><li class="nav-item" id="search-btn"><a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;&nbsp;<i class="iconfont icon-search"></i>&nbsp;&nbsp;</a></li></ul></div></div></nav><div class="view intro-2" id="background" parallax="true" style="background:url(https://bing.ioliu.cn/v1/rand/) no-repeat center center;background-size:cover"><div class="full-bg-img"><div class="mask flex-center" style="background-color:rgba(0,0,0,.3)"><div class="container text-center white-text fadeInUp"><span class="h2" id="subtitle">fishhook 原理及其源码阅读</span><div class="mt-3 post-meta"><i class="iconfont icon-date-fill" aria-hidden="true"></i> <time datetime="2020-07-09 10:05">2020年7月9日 上午</time></div><div class="mt-1"><span class="post-meta mr-2"><i class="iconfont icon-chart"></i> 3.4k 字 </span><span class="post-meta mr-2"><i class="iconfont icon-clock-fill"></i> 42 分钟</span></div></div></div></div></div></header><main><div class="container-fluid"><div class="row"><div class="d-none d-lg-block col-lg-2"></div><div class="col-lg-8 nopadding-md"><div class="container nopadding-md" id="board-ctn"><div class="py-5" id="board"><div class="post-content mx-auto" id="post"><article class="markdown-body"><blockquote><p>通过前面的两篇<sup id="fnref:1" class="footnote-ref"><a href="#fn:1" rel="footnote"><span class="hint--top hint--rounded" aria-label="Mach-O 文件结构详解和Mach-O 加载时的动态链接">[1]</span></a></sup>文章，大概上弄清楚了 Mach-O 的基本结构和加载过程，接下来将尽可能详细地分析 [fishhook] 源码。</p></blockquote><h1 id="fishhook"><a href="#fishhook" class="headerlink" title="fishhook"></a>fishhook</h1><p>fishhook 是一个非常简单的库，在 iOS 系统的模拟器或真机上，它能对 Mach-O 二进制文件动态地进行符号的重绑定，可以用来跟踪或调试来自系统库里面的函数运行情况。对于来自动态库里面的函数，Mach-O 二进制中只是在运行时将其真实地址链接进来，fishhook 利用这个链接机制进行工作，所以它只能对动态链接的函数才起作用，对在编译时就确定了函数地址的函数不起作用。</p><h1 id="fishhook-原理"><a href="#fishhook-原理" class="headerlink" title="fishhook 原理"></a>fishhook 原理</h1><p>GitHub 官方页面的这张图可以概括原理：<br><img src="349e475/fish-hook-detail.jpg" srcset="/img/loading.gif" alt="原理图"><br>官方文档的翻译：</p><blockquote><p><code>dyld</code> 通过更新 Mach-O 二进制文件 __DATA 段特定 Section 中的指针来绑定懒加载符号和非懒加载符号。 fishhook 通过确定 <code>rebind_symbols</code> 中的每个符号名字的更新位置来重新绑定这些符号，然后写回相应的替换符号。</p></blockquote><blockquote><p>对于给定的 image，<code>__DATA</code> 段包含的可能与动态符号绑定相关的 Setcion 有两个：<code>__nl_symbol_ptr</code> 和 <code>__la_symbol_ptr</code>。 <code>__nl_symbol_ptr</code> 是指向非延迟绑定符号的指针数组（这些指针在加载库时就被绑定），而 <code>__la_symbol_ptr</code> 是引入函数符号的指针数组，在第一次被调用时这些数组通常填充着名为 <code>dyld_stub_binder</code> 的程序（也可以告诉 <code>dyld</code> 在启动时就绑定这些符号）。为了在这些 Section 之中找到与特定位置相对应的符号名称，我们必须跳跃在一些中间层上间接寻址。对于这两个关联的 Section ，Section 标题（定义自 <code>&lt;mach-o/loader.h&gt;</code> 中 section struct）提供了到间接符号表（Indirect Symbol）的偏移量（在 <code>reserved1</code> 字段中）。间接符号表位于二进制文件的 <code>__LINKEDIT</code> 段中，它只是符号表中的索引数组，其索引顺序与非懒加载和懒加载符号数组中的符号顺序相同。因此，对于给定的 <code>nl_symbol_ptr</code> 类型 section ，该 section 中符号表第一个地址对应索引为 <code>indirect_symbol_table[nl_symbol_ptr-&gt; reserved1]</code><sup id="fnref:2" class="footnote-ref"><a href="#fn:2" rel="footnote"><span class="hint--top hint--rounded" aria-label="indirect_symbol_table[nl_symbol_ptr-&gt;reserved1] 等同于 indirect_symtab + section-&gt;reserved1，都是说明当前 section 第一个符号在 Indirect Symbol 中的位置">[2]</span></a></sup>。符号表本身是 <code>nlist</code> 数组（请参见 <code>&lt;mach-o/nlist.h&gt;</code>），每个 <code>nlist</code> 都包含一个指向字符串表的索引，该索引位置刚好存储了 <code>nlist</code> 实际的符号名。因此，对于每个<strong>nl_symbol_ptr和</strong>la_symbol_ptr中的符号指针，我们都可以找到对应的符号，然后找到对应的字符串以与请求的符号名称进行比较，如果存在匹配项，则用 <code>replacement</code> 替换该部分的指针内容。</p></blockquote><h1 id="源码解读"><a href="#源码解读" class="headerlink" title="源码解读"></a>源码解读</h1><p>fishhook 的代码非常简洁，只有两个文件，我们先看<code>.h</code>文件。其中包含一组宏定义:</p><pre><code class="hljs c"><span class="hljs-meta">#<span class="hljs-meta-keyword">if</span> !defined(FISHHOOK_EXPORT)</span>
+  <span class="hljs-meta">#<span class="hljs-meta-keyword">define</span> FISHHOOK_VISIBILITY __attribute__((visibility(<span class="hljs-meta-string">"hidden"</span>)))</span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">else</span></span>
+  <span class="hljs-meta">#<span class="hljs-meta-keyword">define</span> FISHHOOK_VISIBILITY __attribute__((visibility(<span class="hljs-meta-string">"default"</span>)))</span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">endif</span></span></code></pre><p>这是控制符号对外可见性，当使用 <code>__attribute__((visibility(&quot;default&quot;)))</code> 时所修饰的符号对外默认可见，而使用 <code>__attribute__((visibility(&quot;hidden&quot;)))</code> 时对外隐藏该符号。该机制是为了避免符号冲突，尤其是对于动态链接库，不必要可见的符号都应该设置为<code>hidden</code>。</p><ul><li><p><code>rebind_symbols</code></p><pre><code class="hljs c"><span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">rebind_symbols</span><span class="hljs-params">(struct rebinding rebindings[], <span class="hljs-keyword">size_t</span> rebindings_nel)</span> </span>&#123;
+  <span class="hljs-keyword">int</span> retval = prepend_rebindings(&amp;_rebindings_head, rebindings, rebindings_nel);
+  <span class="hljs-keyword">if</span> (retval &lt; <span class="hljs-number">0</span>) &#123;
+    <span class="hljs-keyword">return</span> retval;
+  &#125;
+  <span class="hljs-keyword">if</span> (!_rebindings_head-&gt;next) &#123;
+  <span class="hljs-comment">/**</span>
+<span class="hljs-comment">    _dyld_register_func_for_add_image 被调用时，</span>
+<span class="hljs-comment">    已经被 dyld 加载的 image 会立刻回调，</span>
+<span class="hljs-comment">    后续被 dyld 新加载的 image 也会触发回调</span>
+<span class="hljs-comment">  */</span>
+    _dyld_register_func_for_add_image(_rebind_symbols_for_image);
+  &#125; <span class="hljs-keyword">else</span> &#123;
+    <span class="hljs-keyword">uint32_t</span> c = _dyld_image_count();
+    <span class="hljs-keyword">for</span> (<span class="hljs-keyword">uint32_t</span> i = <span class="hljs-number">0</span>; i &lt; c; i++) &#123;
+      _rebind_symbols_for_image(_dyld_get_image_header(i), \
+      _dyld_get_image_vmaddr_slide(i));
+    &#125;
+  &#125;
+  <span class="hljs-keyword">return</span> retval;
+&#125;</code></pre><p>首先创建了一个静态指针指向的链表数据结构，后来添加的数据会插入到头部，保证后来添加的数据优先被处理。<br>随后流程被转向 <code>rebind_symbols_for_image</code> 函数</p></li><li><p><code>rebind_symbols_for_image</code></p><pre><code class="hljs c"><span class="hljs-function"><span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">rebind_symbols_for_image</span><span class="hljs-params">(struct rebindings_entry *rebindings,</span></span>
+<span class="hljs-function"><span class="hljs-params">                                       <span class="hljs-keyword">const</span> struct mach_header *header,</span></span>
+<span class="hljs-function"><span class="hljs-params">                                       <span class="hljs-keyword">intptr_t</span> slide)</span> </span>&#123;
+    Dl_info info;
+    
+    <span class="hljs-comment">/**</span>
+<span class="hljs-comment">       向 dyld 查询 header 指向的地址是否存在于某一个 image 里面。</span>
+<span class="hljs-comment">       如果存在，返回非 0；info 中存放具体信息</span>
+<span class="hljs-comment">       如果返回为 0 表示不存在</span>
+<span class="hljs-comment">    */</span>
+    <span class="hljs-keyword">if</span> (dladdr(header, &amp;info) == <span class="hljs-number">0</span>) &#123;
+      <span class="hljs-keyword">return</span>;
+    &#125;
+    
+    <span class="hljs-comment">// 如果 pathname 以 /private/var 开头，可以认为就是 execute 这个 image</span>
+    <span class="hljs-keyword">const</span> <span class="hljs-keyword">char</span> *pathname = info.dli_fname;
+    
+    <span class="hljs-keyword">if</span> (<span class="hljs-built_in">strlen</span>(pathname) &gt; <span class="hljs-number">8</span>) &#123;
+        <span class="hljs-keyword">char</span> subPathname[<span class="hljs-number">9</span>] = &#123;<span class="hljs-string">'\0'</span>&#125;;
+        <span class="hljs-keyword">char</span> target[<span class="hljs-number">9</span>] = <span class="hljs-string">"/private"</span>;
+        <span class="hljs-built_in">strncpy</span>(subPathname, pathname, <span class="hljs-number">8</span>);
+        <span class="hljs-keyword">if</span> (!<span class="hljs-built_in">strcmp</span>(subPathname, target)) &#123;
+            isMainImage = <span class="hljs-literal">true</span>;
+        &#125;
+    &#125;
+
+    <span class="hljs-keyword">segment_command_t</span> *cur_seg_cmd;
+    <span class="hljs-keyword">segment_command_t</span> *linkedit_segment = <span class="hljs-literal">NULL</span>;
+    <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">symtab_command</span>* <span class="hljs-title">symtab_cmd</span> = <span class="hljs-title">NULL</span>;</span>
+    <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">dysymtab_command</span>* <span class="hljs-title">dysymtab_cmd</span> = <span class="hljs-title">NULL</span>;</span>
+    <span class="hljs-comment">/* 通过遍历找到 Load Commnads 中 LC_SEGMENT_64.info（）、LC_SYMTAB(规定</span>
+<span class="hljs-comment">                了 symbol table 和 string table 在文件中的位置与大小)、LC_DYSYMTAB，</span>
+<span class="hljs-comment">                    并用指针分别指向他们</span>
+<span class="hljs-comment">     */</span>
+    <span class="hljs-keyword">uintptr_t</span> cur = (<span class="hljs-keyword">uintptr_t</span>)header + <span class="hljs-keyword">sizeof</span>(<span class="hljs-keyword">mach_header_t</span>);
+    <span class="hljs-keyword">for</span> (uint i = <span class="hljs-number">0</span>; i &lt; header-&gt;ncmds; i++, cur += cur_seg_cmd-&gt;cmdsize) &#123;
+      cur_seg_cmd = (<span class="hljs-keyword">segment_command_t</span> *)cur;
+      <span class="hljs-keyword">if</span> (cur_seg_cmd-&gt;cmd == LC_SEGMENT_ARCH_DEPENDENT) &#123;
+        <span class="hljs-keyword">if</span> (<span class="hljs-built_in">strcmp</span>(cur_seg_cmd-&gt;segname, SEG_LINKEDIT) == <span class="hljs-number">0</span>) &#123;
+          linkedit_segment = cur_seg_cmd;
+        &#125;
+      &#125; <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (cur_seg_cmd-&gt;cmd == LC_SYMTAB) &#123;
+        symtab_cmd = (struct symtab_command*)cur_seg_cmd;
+      &#125; <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (cur_seg_cmd-&gt;cmd == LC_DYSYMTAB) &#123;
+        dysymtab_cmd = (struct dysymtab_command*)cur_seg_cmd;
+      &#125;
+    &#125;
+
+    <span class="hljs-keyword">if</span> (!symtab_cmd || !dysymtab_cmd || !linkedit_segment ||
+        !dysymtab_cmd-&gt;nindirectsyms) &#123;
+      <span class="hljs-keyword">return</span>;
+    &#125;
+
+    <span class="hljs-comment">/* Find base symbol/string table addresses</span>
+<span class="hljs-comment">     ASLR 地址 + linkedit 描述的 segment 被加载到内存后的地址 - linkedit 在文件中的偏移 =</span>
+<span class="hljs-comment">                        文件开始位置在内存中的地址（file Offset 为 0 的地方）的值</span>
+<span class="hljs-comment">     如果 16 进制查看（ p/x linkedit_base）其值，会发现和 header 指针相同</span>
+<span class="hljs-comment">    */</span>
+    <span class="hljs-keyword">uintptr_t</span> linkedit_base = (<span class="hljs-keyword">uintptr_t</span>)slide + linkedit_segment-&gt;vmaddr - \ 
+       linkedit_segment-&gt;fileoff;
+    <span class="hljs-comment">/* 得到 LC_SYMTAB 在内存中的地址。体现了 Mach-O 的某一处相对于文件偏移的位置，</span>
+<span class="hljs-comment">      是如何对应到运行时的内存地址</span>
+<span class="hljs-comment">     symbol table 是一个 nlist_64 结构体数组，所以指向结构体数组指针</span>
+<span class="hljs-comment">     */</span>
+    <span class="hljs-keyword">nlist_t</span> *symtab = (<span class="hljs-keyword">nlist_t</span> *)(linkedit_base + symtab_cmd-&gt;symoff);
+    <span class="hljs-comment">//  strtab 以 '\0' 分割的，列出了所有可见字符串</span>
+    <span class="hljs-comment">// string table 就是 ASCII 组成的数组，所以使用 char* 描述</span>
+    <span class="hljs-keyword">char</span> *strtab = (<span class="hljs-keyword">char</span> *)(linkedit_base + symtab_cmd-&gt;stroff);
+    
+    
+    <span class="hljs-comment">// Get indirect symbol table (array of uint32_t indices into symbol table)</span>
+    <span class="hljs-comment">// Dynamic Symbol Table (Indirect Symbols) 在内存中的地址</span>
+    <span class="hljs-keyword">uint32_t</span> *indirect_symtab = (<span class="hljs-keyword">uint32_t</span> *)(linkedit_base + \ 
+      dysymtab_cmd-&gt;indirectsymoff);
+
+    cur = (<span class="hljs-keyword">uintptr_t</span>)header + <span class="hljs-keyword">sizeof</span>(<span class="hljs-keyword">mach_header_t</span>);
+    <span class="hljs-comment">// 每遍历一个，序号 i ++，cur 指向下一个 load command 的头部</span>
+    <span class="hljs-keyword">for</span> (uint i = <span class="hljs-number">0</span>; i &lt; header-&gt;ncmds; i++, cur += cur_seg_cmd-&gt;cmdsize) &#123;
+      cur_seg_cmd = (<span class="hljs-keyword">segment_command_t</span> *)cur;
+      <span class="hljs-keyword">if</span> (cur_seg_cmd-&gt;cmd == LC_SEGMENT_ARCH_DEPENDENT) &#123;
+        <span class="hljs-keyword">if</span> (<span class="hljs-built_in">strcmp</span>(cur_seg_cmd-&gt;segname, SEG_DATA) != <span class="hljs-number">0</span> &amp;&amp;
+            <span class="hljs-built_in">strcmp</span>(cur_seg_cmd-&gt;segname, SEG_DATA_CONST) != <span class="hljs-number">0</span>) &#123;
+          <span class="hljs-keyword">continue</span>;
+        &#125;
+          <span class="hljs-comment">/* segment.name 为 __DATA 或 __DATA_CONST，因为动态链接库的符号的 stub 就在里面指定。</span>
+<span class="hljs-comment">           __TEXT.__stubs 的这里不用管，因为当某一个延迟绑定的函数被调用时，</span>
+<span class="hljs-comment">           一定会被转 __DATA_CONST和__DATA的 __got 或 __la_symbol_ptr区域</span>
+<span class="hljs-comment">           </span>
+<span class="hljs-comment">           非延迟绑定的符号(来自于 __DATA_CONST.__got) 也能被重新绑定，</span>
+<span class="hljs-comment">           因为它和延迟绑定的符号工作机制相同，只是绑定时机不同</span>
+<span class="hljs-comment">           */</span>
+        <span class="hljs-keyword">for</span> (uint j = <span class="hljs-number">0</span>; j &lt; cur_seg_cmd-&gt;nsects; j++) &#123;
+          <span class="hljs-keyword">section_t</span> *sect =
+            (<span class="hljs-keyword">section_t</span> *)(cur + <span class="hljs-keyword">sizeof</span>(<span class="hljs-keyword">segment_command_t</span>)) + j;
+            <span class="hljs-comment">/* 遍历 __DATA 和 __DATA_CONST 的每一个 section，</span>
+<span class="hljs-comment">                找到延迟绑定和非延迟绑定符号所在的 section，然后琢磨着偷梁换柱</span>
+<span class="hljs-comment">                */</span>
+          <span class="hljs-keyword">if</span> ((sect-&gt;flags &amp; SECTION_TYPE) == S_LAZY_SYMBOL_POINTERS) &#123;
+              <span class="hljs-keyword">if</span> (isMainImage) &#123;
+                  <span class="hljs-built_in">printf</span>(<span class="hljs-string">"section.name=%s,reserved1=%d\n\n"</span>,\ 
+                  sect-&gt;sectname,sect-&gt;reserved1);
+              &#125;
+            perform_rebinding_with_section(rebindings, sect, slide, \ 
+              symtab, strtab, indirect_symtab);
+          &#125;
+          <span class="hljs-keyword">if</span> ((sect-&gt;flags &amp; SECTION_TYPE) == S_NON_LAZY_SYMBOL_POINTERS) &#123;
+              <span class="hljs-keyword">if</span> (isMainImage) &#123;
+                  <span class="hljs-built_in">printf</span>(<span class="hljs-string">"section.name=%s,reserved1=%d\n\n"</span>,\ 
+                  sect-&gt;sectname,sect-&gt;reserved1);
+              &#125;
+            perform_rebinding_with_section(rebindings, sect, \ 
+            slide, symtab, strtab, indirect_symtab);
+          &#125;
+        &#125;
+      &#125;
+    &#125;
+&#125;</code></pre><p>这一步是将所有 <code>image</code> 的懒加载符号表、非懒加载符号表、字符串表、间接符号表的入口位置找到，然后准备调动<code>perform_rebinding_with_section</code> 进行真正的绑定逻辑。<br>这个函数每一个 <code>image</code> 都会被调用，为了专注于当前二进制所在的 <code>image</code>，我添加了一个静态变量辅助断点:<code>static bool isMainImage = false;</code>，个人认为比较难以理解的行都加上了详细的注释。</p></li><li><p><code>perform_rebinding_with_section</code></p><pre><code class="hljs c"><span class="hljs-function"><span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">perform_rebinding_with_section</span><span class="hljs-params">(struct rebindings_entry *rebindings,</span></span>
+<span class="hljs-function"><span class="hljs-params">                                             <span class="hljs-keyword">section_t</span> *section,</span></span>
+<span class="hljs-function"><span class="hljs-params">                                             <span class="hljs-keyword">intptr_t</span> slide,</span></span>
+<span class="hljs-function"><span class="hljs-params">                                             <span class="hljs-keyword">nlist_t</span> *symtab,</span></span>
+<span class="hljs-function"><span class="hljs-params">                                             <span class="hljs-keyword">char</span> *strtab,</span></span>
+<span class="hljs-function"><span class="hljs-params">                                             <span class="hljs-keyword">uint32_t</span> *indirect_symtab)</span> </span>&#123;
+    <span class="hljs-keyword">const</span> <span class="hljs-keyword">bool</span> isDataConst = <span class="hljs-built_in">strcmp</span>(section-&gt;segname, SEG_DATA_CONST) == <span class="hljs-number">0</span>;
+    <span class="hljs-comment">/* __DATA 和 __DATA_CONST 的延迟和非延迟绑定 section 的 reserved1 字段</span>
+<span class="hljs-comment">    section.name = __got, reserved1=31; section.name = __la_symbol_ptr, reserved1 = 34</span>
+<span class="hljs-comment">     通过在间接跳转表中偏移 section-&gt;reserved1，找到当前 section （可能为__got 或 </span>
+<span class="hljs-comment">        __la_symbol_ptr）第一个符号表在间接跳转表中的位置</span>
+<span class="hljs-comment">     */</span>
+    <span class="hljs-keyword">uint32_t</span> *indirect_symbol_indices = indirect_symtab + section-&gt;reserved1;
+    <span class="hljs-keyword">if</span> (isMainImage) &#123;<span class="hljs-comment">// FISHIHOOkDEMO</span>
+        <span class="hljs-built_in">printf</span>(<span class="hljs-string">"Got U!\n"</span>);
+    &#125;
+    <span class="hljs-comment">/** 1. 二级指针，指向当前 section 的头部</span>
+<span class="hljs-comment">    2. 当前 Section 是 __DATA 类型 Section，懒加载（或非懒加载）符号表里面的每一项的值是一个地址，</span>
+<span class="hljs-comment">        虽然初始值可能不相同，但最终的预期都是指向各自的真实函数的地址</span>
+<span class="hljs-comment">    3. 对于我们来说，需要修改的是指针指向的指针的值，所以此处直接申明为二级指针</span>
+<span class="hljs-comment">     */</span>
+    <span class="hljs-keyword">void</span> **indirect_symbol_bindings = (<span class="hljs-keyword">void</span> **)((<span class="hljs-keyword">uintptr_t</span>)slide + section-&gt;addr);
+    <span class="hljs-keyword">vm_prot_t</span> oldProtection = VM_PROT_READ;
+    <span class="hljs-keyword">if</span> (isDataConst) &#123;
+      <span class="hljs-comment">/* 对于 __DATA_CONST，需要修改内存权限，暂时修改为可读可写，</span>
+<span class="hljs-comment">          以便接下来能够将 replacement 地址写入</span>
+<span class="hljs-comment">      */</span>
+      oldProtection = get_protection(rebindings);
+      mprotect(indirect_symbol_bindings, section-&gt;<span class="hljs-built_in">size</span>, PROT_READ | PROT_WRITE);
+    &#125;
+    <span class="hljs-comment">/* 名字为 __got 或 __la_symbol_ptr 的 Section 就是存放一系列函数地址的列表，</span>
+<span class="hljs-comment">      所以将 sizeof(void *) 作为循环步进长度</span>
+<span class="hljs-comment">      */</span>
+    <span class="hljs-keyword">for</span> (uint i = <span class="hljs-number">0</span>; i &lt; section-&gt;<span class="hljs-built_in">size</span> / <span class="hljs-keyword">sizeof</span>(<span class="hljs-keyword">void</span> *); i++) &#123;
+        <span class="hljs-comment">/* 相当于是取 indirect_symbol_indices 指向地址偏移 (sizeof(uint32_t *) * i) 处的值，</span>
+<span class="hljs-comment">                    这是一个索引，可以在 symbol table 中找到具体的 symbol 结构（nlist_64）</span>
+<span class="hljs-comment">         */</span>
+      <span class="hljs-keyword">uint32_t</span> symtab_index = indirect_symbol_indices[i];
+      <span class="hljs-keyword">if</span> (symtab_index == INDIRECT_SYMBOL_ABS || \ 
+          symtab_index == INDIRECT_SYMBOL_LOCAL ||
+          symtab_index == (INDIRECT_SYMBOL_LOCAL   | INDIRECT_SYMBOL_ABS)) &#123;
+        <span class="hljs-keyword">continue</span>;
+      &#125;
+      <span class="hljs-comment">/* 在 symbol table （nlist_64） 中得到当前符号在字符串表中的偏移，</span>
+<span class="hljs-comment">          并在字符串表中取到当前符号的名字（字符串）</span>
+<span class="hljs-comment">      */</span>
+      <span class="hljs-keyword">uint32_t</span> strtab_offset = symtab[symtab_index].n_un.n_strx;
+      <span class="hljs-keyword">char</span> *symbol_name = strtab + strtab_offset;
+        <span class="hljs-comment">/* 字符串长度为 0 或者为 1 时，第 0 或第 1 个位置肯定是 '\0'，</span>
+<span class="hljs-comment">          任意值与它 &amp;&amp; 运算时一定为 false。为 false 时即字符串说明长度小于等于 1</span>
+<span class="hljs-comment">         */</span>
+      <span class="hljs-keyword">bool</span> symbol_name_longer_than_1 = symbol_name[<span class="hljs-number">0</span>] &amp;&amp; symbol_name[<span class="hljs-number">1</span>];
+      <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">rebindings_entry</span> *<span class="hljs-title">cur</span> = <span class="hljs-title">rebindings</span>;</span>
+      <span class="hljs-keyword">while</span> (cur) &#123; <span class="hljs-comment">// 典型的链表遍历</span>
+        <span class="hljs-keyword">for</span> (uint j = <span class="hljs-number">0</span>; j &lt; cur-&gt;rebindings_nel; j++) &#123;
+            <span class="hljs-comment">/* 比较当前遍历的字符串是否和待替换的相同</span>
+<span class="hljs-comment">             `[]`的优先级高于`&amp;`，所以 `&amp;symbol_name[1]` 取的是去掉</span>
+<span class="hljs-comment">              第一个字符后的字符串（字符串总是以'\0'为终止条件），即去掉编译器在函数前面添加的"_"</span>
+<span class="hljs-comment">             这也是为什么要求字符串长度大于 1 的原因</span>
+<span class="hljs-comment">             */</span>
+          <span class="hljs-keyword">if</span> (symbol_name_longer_than_1 &amp;&amp;
+              <span class="hljs-built_in">strcmp</span>(&amp;symbol_name[<span class="hljs-number">1</span>], cur-&gt;rebindings[j].name) == <span class="hljs-number">0</span>) &#123;
+            <span class="hljs-keyword">if</span> (cur-&gt;rebindings[j].replaced != <span class="hljs-literal">NULL</span> &amp;&amp;
+                indirect_symbol_bindings[i] != cur-&gt;rebindings[j].replacement) &#123;
+                <span class="hljs-comment">/* indirect_symbol_bindings[i] 存放的是系统原来的实现函数的指针：</span>
+<span class="hljs-comment">                      对于懒加载符号，如果在这之前已经被绑定过，</span>
+<span class="hljs-comment">                        indirect_symbol_bindings[i] 就是该符号真实地址；</span>
+<span class="hljs-comment">                      如果没有被绑定过，</span>
+<span class="hljs-comment">                        indirect_symbol_bindings[i] 就指向 __TEXT.__stub_helper 中</span>
+<span class="hljs-comment">                 不管怎么样，系统原来的实现地址（也可能是间接地址），</span>
+<span class="hljs-comment">                  会被存入 replaced 指针指向的空间中</span>
+<span class="hljs-comment">                 replaced 是一个二级指针，值为二级指针的地址，初始时指向的内容为 0x00</span>
+<span class="hljs-comment">                 二级指针的目的：为了和 indirect_symbol_bindings 的结构保持一致，</span>
+<span class="hljs-comment">                        以便在首次调用时能够借助 __TEXT.__stub_helper 将符号的真实地址写回来</span>
+<span class="hljs-comment">                 */</span>
+              *(cur-&gt;rebindings[j].replaced) = indirect_symbol_bindings[i];
+            &#125;
+              <span class="hljs-comment">/* 新的函数地址写入到了当前 Section 的符号表项目中，</span>
+<span class="hljs-comment">                以后在调用时读取符号表的此项目 Data 时，读取的就是 replacement 的地址</span>
+<span class="hljs-comment">               */</span>
+            indirect_symbol_bindings[i] = cur-&gt;rebindings[j].replacement;
+              <span class="hljs-comment">// 如果找到了，对符号表 Section 中的下一个符号进行检查</span>
+            <span class="hljs-keyword">goto</span> symbol_loop;
+          &#125;
+        &#125;
+        cur = cur-&gt;next;
+      &#125;
+    symbol_loop:;
+    &#125;
+    <span class="hljs-keyword">if</span> (isDataConst) &#123;
+        <span class="hljs-comment">// __DATA_CONST 类型的 Section 内存写入完成后，恢复成原来的内存权限</span>
+      <span class="hljs-keyword">int</span> protection = <span class="hljs-number">0</span>;
+      <span class="hljs-keyword">if</span> (oldProtection &amp; VM_PROT_READ) &#123;
+        protection |= PROT_READ;
+      &#125;
+      <span class="hljs-keyword">if</span> (oldProtection &amp; VM_PROT_WRITE) &#123;
+        protection |= PROT_WRITE;
+      &#125;
+      <span class="hljs-keyword">if</span> (oldProtection &amp; VM_PROT_EXECUTE) &#123;
+        protection |= PROT_EXEC;
+      &#125;
+      mprotect(indirect_symbol_bindings, section-&gt;<span class="hljs-built_in">size</span>, protection);
+    &#125;
+&#125;</code></pre><p>这一步是核心逻辑，我带着“为什么”去理解每一行，并做了详细的记录，其中有很多涉及到 <code>c</code> 语言中指针类型的运用，也有和 Mach-O 中各数据结构相关的，需要对照着头文件去一步一步理解。当然，如有理解不到位的，还是非常希望得到大佬的指正。</p></li></ul><h1 id="fishhook-验证"><a href="#fishhook-验证" class="headerlink" title="fishhook 验证"></a>fishhook 验证</h1><p>以上所有代码在 <a href="https://github.com/Navimark/FISHHOOKDEMO" target="_blank" rel="noopener">FISHHOOKDEMO</a> 仓库中，该仓库包含一个 demo 工程，下面基于此 demo 工程进行验证。</p><h1 id="感悟"><a href="#感悟" class="headerlink" title="感悟"></a>感悟</h1><p>这是 Mach-O 系列文章的第三篇。Mach-O 连接着应用程序和操作系统，通过它能够熟悉操作系统对应用程序的加载和处理过程，而在这些过程中往往隐藏着魔法，比如目前热门的“二进制重排提升启动速度”、“通过 zsource 保留二进制组件化后源码调试能力”、“符号表被 strip 后的重建”、“ALSR 与 PIC、PIE的原理与应用”、“解析崩溃日志 .crash” 等技术点和其解决方案，如果我们熟悉了底层的原理后，在回头去看这些技术方案肯定会事半功倍，甚至能够提出更好的解决方案。</p><p>在这之前，我对汇编一窍不通，而且看到汇编就想跳过，但是在前段的学习过程中，我尝试让自己热爱汇编，对照 MachOView 逐行单步调试去理解符号的绑定流程，不懂的就去查，慢慢地，我能看懂了一些汇编代码，体会到了汇编代码操作地址和数据的魅力，也终于弄懂了符号绑定的流程。到后来，我对汇编没有了抗拒感，虽然也还是有很多看不懂，但心态变得积极，非常渴望去弄清楚。我相信一件事情，只要“热爱”了、动手去做了，肯定就能成！</p><section class="footnotes"><div class="footnote-list"><ol><li><span id="fn:1" class="footnote-text"><span><a href="https://alphabyte.tk/posts/a58100d4.html">Mach-O 文件结构详解</a>和<a href="https://alphabyte.tk/posts/a5ddcb7c.html">Mach-O 加载时的动态链接</a><a href="#fnref:1" rev="footnote" class="footnote-backref"> ↩</a></span></span></li><li><span id="fn:2" class="footnote-text"><span><code>indirect_symbol_table[nl_symbol_ptr-&gt;reserved1]</code> 等同于 <code>indirect_symtab + section-&gt;reserved1</code>，都是说明当前 section 第一个符号在 Indirect Symbol 中的位置<a href="#fnref:2" rev="footnote" class="footnote-backref"> ↩</a></span></span></li></ol></div></section></article><hr><div><div class="post-metas mb-3"><div class="post-meta mr-3"><i class="iconfont icon-category"></i> <a class="hover-with-bg" href="/categories/Mach-O/">Mach-O</a> <a class="hover-with-bg" href="/categories/Mach-O/%E5%BA%95%E5%B1%82/">底层</a></div><div class="post-meta"><i class="iconfont icon-tags"></i> <a class="hover-with-bg" href="/tags/Mach-O/">Mach-O</a> <a class="hover-with-bg" href="/tags/%E5%BA%95%E5%B1%82/">底层</a> <a class="hover-with-bg" href="/tags/%E5%8A%A0%E8%BD%BD%E6%96%B9%E5%BC%8F/">加载方式</a></div></div><p class="note note-warning">本博客所有文章除特别声明外，均采用 <a href="https://zh.wikipedia.org/wiki/Wikipedia:CC_BY-SA_3.0%E5%8D%8F%E8%AE%AE%E6%96%87%E6%9C%AC" target="_blank" rel="nofollow noopener noopener">CC BY-SA 3.0协议</a> 。转载请注明出处！</p><div class="post-prevnext row"><div class="post-prev col-6"></div><div class="post-next col-6"><a href="/posts/a5ddcb7c.html"><span class="hidden-mobile">Mach-O 加载时的动态链接</span> <span class="visible-mobile">下一篇</span> <i class="iconfont icon-arrowright"></i></a></div></div></div><div class="comments" id="comments"><script type="text/javascript">function loadUtterances(){var t=document.createElement("script");t.setAttribute("src","https://utteranc.es/client.js"),t.defer=!1,t.setAttribute("repo","Navimark/navimark.github.io"),t.setAttribute("issue-term","pathname"),t.setAttribute("label","utterances"),t.setAttribute("theme","github-light"),t.setAttribute("crossorigin","anonymous");var e=document.getElementsByTagName("script")[0];e.parentNode.insertBefore(t,e)}createObserver(loadUtterances,"comments")</script></div></div></div></div></div><div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn"><div id="toc"><p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p><div id="tocbot"></div></div></div></div></div></main><a id="scroll-top-button" href="#" role="button"><i class="iconfont icon-arrowup" aria-hidden="true"></i></a><div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable modal-lg" role="document"><div class="modal-content"><div class="modal-header text-center"><h4 class="modal-title w-100 font-weight-bold">搜索</h4><button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button></div><div class="modal-body mx-3"><div class="md-form mb-5"><input type="text" id="local-search-input" class="form-control validate"> <label data-error="x" data-success="v" for="local-search-input">关键词</label></div><div class="list-group" id="local-search-result"></div></div></div></div></div><footer class="mt-5"><div class="text-center py-3"><div><a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a></div><span id="cnzz_stat_icon_1278975811" style="display:none"></span></div></footer><script src="https://cdn.staticfile.org/jquery/3.4.1/jquery.min.js"></script><script src="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/js/bootstrap.min.js"></script><script src="/js/debouncer.js"></script><script src="/js/main.js"></script><script src="/js/lazyload.js"></script><script defer src="https://cdn.staticfile.org/clipboard.js/2.0.6/clipboard.min.js"></script><script src="/js/clipboard-use.js"></script><script src="https://cdn.staticfile.org/tocbot/4.11.1/tocbot.min.js"></script><script>$(document).ready(function(){var t=$("#board-ctn").offset().top;tocbot.init({tocSelector:"#tocbot",contentSelector:"article.markdown-body",headingSelector:"h1,h2,h3,h4,h5,h6",linkClass:"tocbot-link",activeLinkClass:"tocbot-active-link",listClass:"tocbot-list",isCollapsedClass:"tocbot-is-collapsed",collapsibleClass:"tocbot-is-collapsible",collapseDepth:6,scrollSmooth:!0,headingsOffset:-t}),0<$(".toc-list-item").length&&$("#toc").css("visibility","visible")})</script><script src="https://cdn.staticfile.org/anchor-js/4.2.2/anchor.min.js"></script><script>anchors.options = {
+      placement: "right",
+      visible: "hover",
+      
+    };
+    var el = "h1,h2,h3,h4,h5,h6".split(",");
+    var res = [];
+    for (item of el) {
+      res.push(".markdown-body > " + item)
+    }
+    anchors.add(res.join(", "))</script><script src="/js/local-search.js"></script><script>var path="/local-search.xml",inputArea=document.querySelector("#local-search-input");inputArea.onclick=function(){searchFunc(path,"local-search-input","local-search-result"),this.onclick=null}</script><script src="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.js"></script><link rel="stylesheet" href="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.css"><script>$("#post img:not(.no-zoom img, img[no-zoom]), img[zoom]").each(function(){var t=document.createElement("a");$(t).attr("data-fancybox","images"),$(t).attr("href",$(this).attr("src")),$(this).wrap(t)})</script><script defer>var _hmt=_hmt||[];!function(){var e=document.createElement("script");e.src="https://hm.baidu.com/hm.js?6a6c74ccff0eef9cb35e12dff55022b0";var t=document.getElementsByTagName("script")[0];t.parentNode.insertBefore(e,t)}()</script><script defer>!function(e,a,t,n,g,c,o){e.GoogleAnalyticsObject="ga",e.ga=e.ga||function(){(e.ga.q=e.ga.q||[]).push(arguments)},e.ga.l=1*new Date,c=a.createElement(t),o=a.getElementsByTagName(t)[0],c.async=1,c.src="https://www.google-analytics.com/analytics.js",o.parentNode.insertBefore(c,o)}(window,document,"script"),ga("create","UA-154660540-1","auto"),ga("send","pageview")</script><script defer src="//s4.cnzz.com/z_stat.php?id=1278975811&show=pic" type="text/javascript"></script></body></html>
