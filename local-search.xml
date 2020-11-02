@@ -4,6 +4,31 @@
   
   
   <entry>
+    <title>使用 Xcode 编译规则提升代码质量</title>
+    <link href="/posts/d463489f.html"/>
+    <url>/posts/d463489f.html</url>
+    
+    <content type="html"><![CDATA[<blockquote><p>随着项目的迭代，工程代码量越来越大，如果使用 Xcode 默认的编译警告级别，越来越多的隐患将被隐藏在代码中，这类隐患代码大部分来自旧代码，也有部分来自日常开发的代码，特别是在模块重构时，这些代码大概率会成为 bug 的发源地，也将会是后期优化的绊脚石。</p></blockquote><p>由于 Objective-C 语言的动态性，部分不安全的代码写法在编译时并不会报错(error)，只是会产生警告 (warning)，而后者总会有意无意地总被忽略掉。通过新增加编译检查规则，提升编译器的校验级别，强制对可能存在隐患的代码拒绝编译通过，能尽可能减少人为出错，提升代码质量。</p><h1 id="如何提升校验级别"><a href="#如何提升校验级别" class="headerlink" title="如何提升校验级别"></a>如何提升校验级别</h1><p>Xcode 中允许开发者自行添加编译校验规则，如下图：<br><img src="d463489f/1.jpg" srcset="/img/loading.gif" alt=""><br>这些规则可以通过编译日志查询得到：<br><img src="d463489f/2.jpg" srcset="/img/loading.gif" alt=""><br>上图中紧接 <code>-W</code> 的字符串都是编译规则，具体含义可以去 <a href="https://clang.llvm.org/docs/DiagnosticsReference.html" target="_blank" rel="noopener">Clang 文档</a>上查找。找到需要的校验规则后，比如<code>-Wunreachable-code</code>，将其转换成 error 格式 <code>-Werror=unreachable-code</code>，然后填写到 Targets -&gt; Build Settings -&gt;Apple Clang-Custom Compiler Flags 中即可，再次编译时，原先 <code>unreachable-code</code> 地方的代码就会报错，提醒我们删掉不相关的代码，精简结构。</p><h1 id="实用的校验规则"><a href="#实用的校验规则" class="headerlink" title="实用的校验规则"></a>实用的校验规则</h1><p>我们目前用到的规则有下面几条：</p><ol><li>未用到的变量<ul><li>规则：<code>-Werror=unused-variable</code></li><li>例外：在变量前添加 <code>__unused</code> 修饰</li></ul></li><li><code>switch</code> 中 <code>case</code> 没有完全列举<ul><li>规则：<code>-Werror=switch</code></li><li>例外：使用 <code>default</code> 关键字。其实这里不建议使用 <code>default</code>，如果后期因为业务代码变动 <code>case</code> 有增删改，它不会显示地报错误或者警告，只会默默地“吃掉”这些增删改，非常不便于错误排查。</li></ul></li><li>方法有申明，但是没有实现<ul><li>规则：<code>-Werror=incomplete-implementation</code></li><li>例外：无例外，不允许出现。曾经碰到到在 <code>.h</code> 里面有申明但是 <code>.m</code> 中忘记写实现的情况，险些酿成大错。</li></ul></li><li>调用未申明的 selector<ul><li>规则：<code>-Werror=undeclared-selector</code></li><li>例外：<pre><code class="hljs objc"><span class="hljs-meta">#<span class="hljs-meta-keyword">pragma</span> clang diagnostic push</span><span class="hljs-meta">#<span class="hljs-meta-keyword">pragma</span> clang diagnostic ignored <span class="hljs-meta-string">"-Wundeclared-selector"</span></span>    [<span class="hljs-keyword">self</span> performSelector:<span class="hljs-keyword">@selector</span>(testFun)];<span class="hljs-meta">#<span class="hljs-meta-keyword">pragma</span> clang diagnostic pop</span></code></pre></li></ul></li><li>未实现标记为 <code>@required</code> 的协议方法<ul><li>规则：<code>-Werror=protocol</code></li><li>例外：如果不需要实现，申明改为 <code>@optional</code>；如果是 <code>@required</code> 必须要实现</li></ul></li><li>不同指针类型间赋值(比如 <code>NSNumber *</code> 赋值给 <code>NSString *</code>、<code>NSArray&lt;NSNumber *&gt; *</code> 赋值给 <code>NSArray&lt;NSString *&gt; *</code>)<ul><li>规则：<code>-Werror=incompatible-pointer-types</code></li><li>例外：尽量避免这种情况出现。如果很清楚后果，显示地类型转换</li></ul></li><li>指针隐式赋值给基本类型（如 self 指针赋值给 int 变量）<ul><li>规则：<code>-Werror=int-conversion</code></li><li>例外：尽量避免这种情况出现。如果很清楚后果，显示地类型转换</li></ul></li><li>不同枚举类型之间赋值<ul><li>规则：<code>-Werror=enum-conversion</code></li><li>例外：尽量避免这种情况出现。如果很清楚后果，显示地类型转换</li></ul></li></ol><p>目前这些规则，已经帮我们避免了很多隐藏问题，后续会根据实际情况再增加或删除。</p>]]></content>
+    
+    
+    <categories>
+      
+      <category>开发技巧</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>Xcode</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>给 Xcode 工程的 AppIcon 添加版本信息</title>
     <link href="/posts/4b4dbb8b.html"/>
     <url>/posts/4b4dbb8b.html</url>
@@ -55,9 +80,9 @@
     
     <tags>
       
-      <tag>Mach-O</tag>
-      
       <tag>底层</tag>
+      
+      <tag>Mach-O</tag>
       
       <tag>加载方式</tag>
       
@@ -84,9 +109,9 @@
     
     <tags>
       
-      <tag>Mach-O</tag>
-      
       <tag>底层</tag>
+      
+      <tag>Mach-O</tag>
       
       <tag>加载方式</tag>
       
@@ -169,13 +194,13 @@
     
     <tags>
       
-      <tag>Mach-O</tag>
-      
       <tag>底层</tag>
       
       <tag>iOS</tag>
       
       <tag>Objective-C</tag>
+      
+      <tag>Mach-O</tag>
       
       <tag>数据结构</tag>
       
