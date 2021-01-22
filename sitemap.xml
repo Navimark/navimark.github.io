@@ -2,80 +2,273 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
-    <loc>https://alphabyte.tk/posts/d463489f.html</loc>
+    <loc>https://alphabyte.tk/posts/fc800951.html</loc>
     
-    <lastmod>2020-11-09T09:26:54.149Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://alphabyte.tk/posts/4b4dbb8b.html</loc>
-    
-    <lastmod>2020-09-30T01:55:48.019Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://alphabyte.tk/posts/349e475.html</loc>
-    
-    <lastmod>2020-07-22T02:01:20.649Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://alphabyte.tk/posts/a5ddcb7c.html</loc>
-    
-    <lastmod>2020-07-02T09:50:56.377Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://alphabyte.tk/posts/f5d9b671.html</loc>
-    
-    <lastmod>2020-07-01T13:23:22.335Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://alphabyte.tk/posts/feb5cc21.html</loc>
-    
-    <lastmod>2020-06-08T12:35:17.027Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://alphabyte.tk/posts/a58100d4.html</loc>
-    
-    <lastmod>2020-06-08T12:35:14.370Z</lastmod>
+    <lastmod>2021-01-22</lastmod>
     
   </url>
   
   <url>
     <loc>https://alphabyte.tk/posts/80ce330f.html</loc>
     
-    <lastmod>2020-06-06T12:39:00.067Z</lastmod>
+    <lastmod>2021-01-20</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://alphabyte.tk/posts/d463489f.html</loc>
+    
+    <lastmod>2021-01-20</lastmod>
     
   </url>
   
   <url>
     <loc>https://alphabyte.tk/posts/a3f46529.html</loc>
     
-    <lastmod>2020-06-06T12:37:08.271Z</lastmod>
+    <lastmod>2021-01-20</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://alphabyte.tk/posts/f5d9b671.html</loc>
+    
+    <lastmod>2021-01-20</lastmod>
     
   </url>
   
   <url>
     <loc>https://alphabyte.tk/posts/c097b069.html</loc>
     
-    <lastmod>2020-05-19T11:47:42.259Z</lastmod>
+    <lastmod>2021-01-20</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://alphabyte.tk/posts/349e475.html</loc>
+    
+    <lastmod>2021-01-20</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://alphabyte.tk/posts/feb5cc21.html</loc>
+    
+    <lastmod>2021-01-20</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://alphabyte.tk/posts/4b4dbb8b.html</loc>
+    
+    <lastmod>2021-01-20</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://alphabyte.tk/posts/a58100d4.html</loc>
+    
+    <lastmod>2021-01-20</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://alphabyte.tk/posts/a5ddcb7c.html</loc>
+    
+    <lastmod>2021-01-20</lastmod>
     
   </url>
   
   <url>
     <loc>https://alphabyte.tk/about/index.html</loc>
     
-    <lastmod>2020-05-05T15:13:13.186Z</lastmod>
+    <lastmod>2020-05-05</lastmod>
     
+  </url>
+  
+
+  <url>
+    <loc>https://alphabyte.tk/</loc>
+    <lastmod>2021-01-22</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+
+  
+  <url>
+    <loc>https://alphabyte.tk/tags/Mach-O/</loc>
+    <lastmod>2021-01-22</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://alphabyte.tk/tags/%E5%BA%95%E5%B1%82/</loc>
+    <lastmod>2021-01-22</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://alphabyte.tk/tags/%E5%8A%A0%E8%BD%BD%E6%96%B9%E5%BC%8F/</loc>
+    <lastmod>2021-01-22</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://alphabyte.tk/tags/lldb/</loc>
+    <lastmod>2021-01-22</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://alphabyte.tk/tags/iOS/</loc>
+    <lastmod>2021-01-22</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://alphabyte.tk/tags/Objective-C/</loc>
+    <lastmod>2021-01-22</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://alphabyte.tk/tags/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/</loc>
+    <lastmod>2021-01-22</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://alphabyte.tk/tags/fastlane/</loc>
+    <lastmod>2021-01-22</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://alphabyte.tk/tags/%E5%B7%A5%E5%85%B7/</loc>
+    <lastmod>2021-01-22</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://alphabyte.tk/tags/match/</loc>
+    <lastmod>2021-01-22</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://alphabyte.tk/tags/%E8%A3%85%E4%BF%AE/</loc>
+    <lastmod>2021-01-22</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://alphabyte.tk/tags/Python/</loc>
+    <lastmod>2021-01-22</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://alphabyte.tk/tags/%E8%84%9A%E6%9C%AC/</loc>
+    <lastmod>2021-01-22</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://alphabyte.tk/tags/Xcode/</loc>
+    <lastmod>2021-01-22</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://alphabyte.tk/tags/LLDB/</loc>
+    <lastmod>2021-01-22</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://alphabyte.tk/tags/%E6%B1%87%E7%BC%96/</loc>
+    <lastmod>2021-01-22</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://alphabyte.tk/tags/block/</loc>
+    <lastmod>2021-01-22</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://alphabyte.tk/tags/%E9%9D%A2%E8%AF%95/</loc>
+    <lastmod>2021-01-22</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://alphabyte.tk/tags/Runtime/</loc>
+    <lastmod>2021-01-22</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+
+  
+  <url>
+    <loc>https://alphabyte.tk/categories/Mach-O/</loc>
+    <lastmod>2021-01-22</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://alphabyte.tk/categories/%E5%BC%80%E5%8F%91%E6%8A%80%E5%B7%A7/</loc>
+    <lastmod>2021-01-22</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://alphabyte.tk/categories/%E5%8D%9A%E5%AE%A2%E8%A3%85%E4%BF%AE/</loc>
+    <lastmod>2021-01-22</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://alphabyte.tk/categories/%E6%B1%87%E7%BC%96/</loc>
+    <lastmod>2021-01-22</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://alphabyte.tk/categories/%E5%BA%95%E5%B1%82/</loc>
+    <lastmod>2021-01-22</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://alphabyte.tk/categories/Mach-O/%E5%BA%95%E5%B1%82/</loc>
+    <lastmod>2021-01-22</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
   </url>
   
 </urlset>
