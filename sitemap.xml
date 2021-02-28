@@ -116,27 +116,6 @@
 
   
   <url>
-    <loc>https://alphabyte.tk/tags/%E7%AE%97%E6%B3%95/</loc>
-    <lastmod>2021-02-28</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>https://alphabyte.tk/tags/%E5%8F%8C%E9%93%BE%E8%A1%A8/</loc>
-    <lastmod>2021-02-28</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>https://alphabyte.tk/tags/Swift/</loc>
-    <lastmod>2021-02-28</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
     <loc>https://alphabyte.tk/tags/Mach-O/</loc>
     <lastmod>2021-02-28</lastmod>
     <changefreq>daily</changefreq>
@@ -186,6 +165,27 @@
   </url>
   
   <url>
+    <loc>https://alphabyte.tk/tags/%E7%AE%97%E6%B3%95/</loc>
+    <lastmod>2021-02-28</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://alphabyte.tk/tags/%E5%8F%8C%E9%93%BE%E8%A1%A8/</loc>
+    <lastmod>2021-02-28</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://alphabyte.tk/tags/Swift/</loc>
+    <lastmod>2021-02-28</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
     <loc>https://alphabyte.tk/tags/fastlane/</loc>
     <lastmod>2021-02-28</lastmod>
     <changefreq>daily</changefreq>
@@ -207,6 +207,13 @@
   </url>
   
   <url>
+    <loc>https://alphabyte.tk/tags/%E8%A3%85%E4%BF%AE/</loc>
+    <lastmod>2021-02-28</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
     <loc>https://alphabyte.tk/tags/Python/</loc>
     <lastmod>2021-02-28</lastmod>
     <changefreq>daily</changefreq>
@@ -215,13 +222,6 @@
   
   <url>
     <loc>https://alphabyte.tk/tags/%E8%84%9A%E6%9C%AC/</loc>
-    <lastmod>2021-02-28</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>https://alphabyte.tk/tags/%E8%A3%85%E4%BF%AE/</loc>
     <lastmod>2021-02-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
@@ -242,7 +242,7 @@
   </url>
   
   <url>
-    <loc>https://alphabyte.tk/tags/block/</loc>
+    <loc>https://alphabyte.tk/tags/LLDB/</loc>
     <lastmod>2021-02-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
@@ -256,14 +256,14 @@
   </url>
   
   <url>
-    <loc>https://alphabyte.tk/tags/%E9%9D%A2%E8%AF%95/</loc>
+    <loc>https://alphabyte.tk/tags/block/</loc>
     <lastmod>2021-02-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
-    <loc>https://alphabyte.tk/tags/LLDB/</loc>
+    <loc>https://alphabyte.tk/tags/%E9%9D%A2%E8%AF%95/</loc>
     <lastmod>2021-02-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
@@ -272,14 +272,14 @@
 
   
   <url>
-    <loc>https://alphabyte.tk/categories/%E7%AE%97%E6%B3%95/</loc>
+    <loc>https://alphabyte.tk/categories/Mach-O/</loc>
     <lastmod>2021-02-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
-    <loc>https://alphabyte.tk/categories/Mach-O/</loc>
+    <loc>https://alphabyte.tk/categories/%E7%AE%97%E6%B3%95/</loc>
     <lastmod>2021-02-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
