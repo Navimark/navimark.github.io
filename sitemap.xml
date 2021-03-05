@@ -249,6 +249,13 @@
   </url>
   
   <url>
+    <loc>https://alphabyte.tk/tags/Xcode/</loc>
+    <lastmod>2021-03-05</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
     <loc>https://alphabyte.tk/tags/LLDB/</loc>
     <lastmod>2021-03-05</lastmod>
     <changefreq>daily</changefreq>
@@ -264,13 +271,6 @@
   
   <url>
     <loc>https://alphabyte.tk/tags/block/</loc>
-    <lastmod>2021-03-05</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>https://alphabyte.tk/tags/Xcode/</loc>
     <lastmod>2021-03-05</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
