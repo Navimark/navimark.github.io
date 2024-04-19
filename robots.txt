@@ -10,7 +10,7 @@ Disallow: /fonts/
 Disallow: /vendors/
 Disallow: /fancybox/
 
-Sitemap: https://alphabyte.tk/sitemap.xml
-Sitemap: https://alphabyte.tk/baidusitemap.xml
-Sitemap: https://alphabyte.tk/sitemap.xml
-Sitemap: https://alphabyte.tk/baidusitemap.xml
+Sitemap: https://navimark.github.io/sitemap.xml
+Sitemap: https://navimark.github.io/baidusitemap.xml
+Sitemap: https://navimark.github.io/sitemap.xml
+Sitemap: https://navimark.github.io/baidusitemap.xml
